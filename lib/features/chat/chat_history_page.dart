@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../core/models/child_profile.dart';
 import '../../core/theme/app_theme.dart';
 import 'chat_page.dart';
 
@@ -18,11 +19,11 @@ class _ChatHistoryTabState extends State<ChatHistoryTab> {
   final _searchController = TextEditingController();
   String _query = '';
 
-  static const _conversations = <_Conversation>[
+  static final _conversations = <_Conversation>[
     _Conversation(
       title: 'Baby fever after vaccines',
-      preview:
-          'My 6-month-old has a fever after their vaccines. Is this normal and how can I help them feel better?',
+      child: demoChildren[0],
+      preview: 'My 6-month-old has a fever after their vaccines. Is this normal and how can I help them feel better?',
       time: '10:24 AM',
       icon: Icons.favorite_rounded,
       color: AppColors.coral,
@@ -51,8 +52,7 @@ class _ChatHistoryTabState extends State<ChatHistoryTab> {
     ),
     _Conversation(
       title: 'Sleep schedule for 8 months',
-      preview:
-          'What does a good sleep schedule look like for an 8-month-old? They’re fighting every nap.',
+      preview: 'What does a good sleep schedule look like for an 8-month-old? They’re fighting every nap.',
       time: '8:17 AM',
       icon: Icons.bedtime_rounded,
       color: Color(0xFF7657EB),
@@ -78,8 +78,8 @@ class _ChatHistoryTabState extends State<ChatHistoryTab> {
     ),
     _Conversation(
       title: 'Toddler picky eating',
-      preview:
-          'My 2-year-old only wants crackers lately. How can I encourage more variety at meals?',
+      child: demoChildren[1],
+      preview: 'My 2-year-old only wants crackers lately. How can I encourage more variety at meals?',
       time: '9:48 PM',
       icon: Icons.restaurant_rounded,
       color: Color(0xFFE39A2E),
@@ -99,7 +99,10 @@ class _ChatHistoryTabState extends State<ChatHistoryTab> {
           'That\'s okay — it can take 10+ exposures before a child accepts a new food. Keep offering small amounts without pressure to eat it, and model enjoying it yourself.',
           isMine: false,
         ),
-        ChatMessage('Good to know, I\'ll stop stressing about it.', isMine: true),
+        ChatMessage(
+          'Good to know, I\'ll stop stressing about it.',
+          isMine: true,
+        ),
         ChatMessage(
           'That\'s the right mindset — consistency over time matters more than any single meal.',
           isMine: false,
@@ -138,8 +141,8 @@ class _ChatHistoryTabState extends State<ChatHistoryTab> {
     ),
     _Conversation(
       title: 'Night waking again',
-      preview:
-          'We’re back to frequent night wakings. Any tips for helping them settle on their own?',
+      child: demoChildren[0],
+      preview: 'We’re back to frequent night wakings. Any tips for helping them settle on their own?',
       time: 'Mar 12',
       icon: Icons.favorite_rounded,
       color: AppColors.coral,
@@ -182,6 +185,7 @@ class _ChatHistoryTabState extends State<ChatHistoryTab> {
       MaterialPageRoute<void>(
         builder: (_) => ChatPage(
           title: conversation?.title ?? 'Chat',
+          selectedChild: conversation?.child,
           initialMessages: conversation?.messages ?? const [],
         ),
       ),
@@ -193,6 +197,7 @@ class _ChatHistoryTabState extends State<ChatHistoryTab> {
     bool matches(_Conversation c) =>
         query.isEmpty ||
         c.title.toLowerCase().contains(query) ||
+        (c.child?.name.toLowerCase().contains(query) ?? false) ||
         c.preview.toLowerCase().contains(query);
 
     final children = <Widget>[];
@@ -465,10 +470,8 @@ class _SectionLabel extends StatelessWidget {
       padding: const EdgeInsets.only(left: 4),
       child: Text(
         text,
-        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-          fontSize: 15,
-          fontWeight: FontWeight.w600,
-        ),
+        style: Theme.of(context).textTheme.bodyLarge
+            ?.copyWith(fontSize: 15, fontWeight: FontWeight.w600),
       ),
     );
   }
@@ -545,6 +548,17 @@ class _ConversationTile extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 3),
+                      if (data.child != null) ...[
+                        Text(
+                          'About ${data.child!.name}',
+                          style: TextStyle(
+                            color: data.color,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                      ],
                       Text(
                         data.preview,
                         maxLines: 2,
@@ -587,7 +601,8 @@ class _EmptyResults extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             'No conversations found',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 15),
+            style: Theme.of(context).textTheme.bodyLarge
+                ?.copyWith(fontSize: 15),
           ),
         ],
       ),
@@ -628,6 +643,7 @@ enum _Bucket {
 class _Conversation {
   const _Conversation({
     required this.title,
+    this.child,
     required this.preview,
     required this.time,
     required this.icon,
@@ -638,6 +654,7 @@ class _Conversation {
   });
 
   final String title;
+  final ChildProfile? child;
   final String preview;
   final String time;
   final IconData icon;

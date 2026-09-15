@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/models/child_profile.dart';
 import '../../core/theme/app_theme.dart';
 import '../chat/chat_page.dart';
 import 'widgets/children_section.dart';
@@ -22,25 +23,6 @@ class _HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
   late final AnimationController _entranceController;
   late final Animation<double> _fadeAnimation;
   late final Animation<Offset> _slideAnimation;
-
-  static const _children = <ChildData>[
-    ChildData(
-      name: 'Emma',
-      lastChatDate: '12 Sep 2026',
-      lastMessage: 'Fever after vaccines',
-      avatarBackground: Color(0xFFFCE1DF),
-      cardStart: Color(0xFFFFFDFC),
-      cardEnd: Color(0xFFFFF3F0),
-    ),
-    ChildData(
-      name: 'Daniel',
-      lastChatDate: '10 Sep 2026',
-      lastMessage: 'Bedtime routine help',
-      avatarBackground: Color(0xFFE3E7FB),
-      cardStart: Color(0xFFFCFDFF),
-      cardEnd: Color(0xFFF1F3FF),
-    ),
-  ];
 
   @override
   void initState() {
@@ -85,9 +67,13 @@ class _HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
       return;
     }
     Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => ChatPage(initialPrompt: prompt),
-      ),
+      MaterialPageRoute<void>(builder: (_) => ChatPage(initialPrompt: prompt)),
+    );
+  }
+
+  void _openChildChat(ChildProfile child) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => ChatPage(selectedChild: child)),
     );
   }
 
@@ -114,9 +100,8 @@ class _HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
                           MotherPromptField(onSubmit: _askMotherAi),
                           const SizedBox(height: 16),
                           ChildrenSection(
-                            children: _children,
-                            onChildTap: (child) =>
-                                _showMessage('${child.name} selected'),
+                            children: demoChildren,
+                            onChildTap: _openChildChat,
                           ),
                           const SizedBox(height: 14),
                           LearnSpotlightCard(

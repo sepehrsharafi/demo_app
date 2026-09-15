@@ -1,6 +1,11 @@
+import 'dart:typed_data';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_picker/image_picker.dart';
 
+import '../../core/models/child_profile.dart';
 import '../../core/theme/app_theme.dart';
 
 class ChatPage extends StatefulWidget {
@@ -10,6 +15,7 @@ class ChatPage extends StatefulWidget {
     this.subtitle = 'Always here for you',
     this.initialMessages = const [],
     this.initialPrompt,
+    this.selectedChild,
   });
 
   /// Header title, e.g. a past conversation's topic.
@@ -24,6 +30,9 @@ class ChatPage extends StatefulWidget {
   /// conversation straight from a prompt typed elsewhere in the app.
   final String? initialPrompt;
 
+  /// The profile this conversation is about.
+  final ChildProfile? selectedChild;
+
   @override
   State<ChatPage> createState() => _ChatPageState();
 }
@@ -31,7 +40,12 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   final _controller = TextEditingController();
   final _scrollController = ScrollController();
+  final _imagePicker = ImagePicker();
   late final _messages = List<ChatMessage>.of(widget.initialMessages);
+  late ChildProfile? _selectedChild = widget.selectedChild;
+  final _pendingAttachments = <ChatAttachment>[];
+
+  static const _maxAttachmentBytes = 10 * 1024 * 1024;
 
   static const _suggestions = <_Suggestion>[
     _Suggestion(
@@ -78,15 +92,20 @@ class _ChatPageState extends State<ChatPage> {
 
   void _send([String? suggestedPrompt]) {
     final text = (suggestedPrompt ?? _controller.text).trim();
-    if (text.isEmpty) return;
+    if (text.isEmpty && _pendingAttachments.isEmpty) return;
 
     FocusScope.of(context).unfocus();
     _controller.clear();
+    final attachments = List<ChatAttachment>.of(_pendingAttachments);
+    final childContext = _selectedChild == null
+        ? 'I’m here with you.'
+        : 'I’m here with you, and I’ll keep ${_selectedChild!.name}’s ${_selectedChild!.age} profile in mind.';
     setState(() {
-      _messages.add(ChatMessage(text, isMine: true));
+      _messages.add(ChatMessage(text, isMine: true, attachments: attachments));
+      _pendingAttachments.clear();
       _messages.add(
-        const ChatMessage(
-          'I’m here with you. Mother AI can offer general guidance, but urgent or worrying symptoms should always be checked by a healthcare professional.',
+        ChatMessage(
+          '$childContext Mother AI can offer general guidance, but urgent or worrying symptoms should always be checked by a healthcare professional.',
           isMine: false,
         ),
       );
@@ -100,6 +119,134 @@ class _ChatPageState extends State<ChatPage> {
         curve: Curves.easeOutCubic,
       );
     });
+  }
+
+  void _showPickerError() {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        const SnackBar(
+          content: Text('That file could not be attached. Please try another.'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: AppColors.navy,
+        ),
+      );
+  }
+
+  void _addAttachments(Iterable<ChatAttachment> attachments) {
+    final accepted = attachments
+        .where((attachment) => attachment.bytes.length <= _maxAttachmentBytes)
+        .toList();
+    if (accepted.length != attachments.length) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text('Attachments must be smaller than 10 MB.'),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: AppColors.navy,
+          ),
+        );
+    }
+    if (accepted.isNotEmpty) {
+      setState(() => _pendingAttachments.addAll(accepted));
+    }
+  }
+
+  Future<void> _pickImages() async {
+    Navigator.of(context).pop();
+    try {
+      final images = await _imagePicker.pickMultiImage(imageQuality: 88);
+      final attachments = <ChatAttachment>[];
+      for (final image in images) {
+        attachments.add(
+          ChatAttachment(
+            name: image.name,
+            bytes: await image.readAsBytes(),
+            isImage: true,
+          ),
+        );
+      }
+      if (mounted) _addAttachments(attachments);
+    } catch (_) {
+      _showPickerError();
+    }
+  }
+
+  Future<void> _takePhoto() async {
+    Navigator.of(context).pop();
+    try {
+      final image = await _imagePicker.pickImage(
+        source: ImageSource.camera,
+        imageQuality: 88,
+      );
+      if (image == null || !mounted) return;
+      _addAttachments([
+        ChatAttachment(
+          name: image.name,
+          bytes: await image.readAsBytes(),
+          isImage: true,
+        ),
+      ]);
+    } catch (_) {
+      _showPickerError();
+    }
+  }
+
+  Future<void> _pickFiles() async {
+    Navigator.of(context).pop();
+    try {
+      final files = await FilePicker.pickFiles();
+      final attachments = <ChatAttachment>[];
+      for (final file in files) {
+        final bytes = await file.readAsBytes();
+        attachments.add(
+          ChatAttachment(
+            name: file.name,
+            bytes: bytes,
+            isImage: _isImageName(file.name),
+          ),
+        );
+      }
+      if (mounted) _addAttachments(attachments);
+    } catch (_) {
+      _showPickerError();
+    }
+  }
+
+  bool _isImageName(String name) {
+    final extension = name.split('.').last.toLowerCase();
+    return const {
+      'jpg',
+      'jpeg',
+      'png',
+      'gif',
+      'webp',
+      'heic',
+    }.contains(extension);
+  }
+
+  void _showAttachmentPicker() {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _AttachmentPickerSheet(
+        onPhotoLibrary: _pickImages,
+        onCamera: _takePhoto,
+        onFile: _pickFiles,
+      ),
+    );
+  }
+
+  Future<void> _chooseChild() async {
+    final selection = await showModalBottomSheet<ChildProfile>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _ChildPickerSheet(selectedChild: _selectedChild),
+    );
+    if (!mounted || selection == null) return;
+    setState(() => _selectedChild = selection);
   }
 
   @override
@@ -118,11 +265,14 @@ class _ChatPageState extends State<ChatPage> {
                     _ChatHeader(
                       title: widget.title,
                       subtitle: widget.subtitle,
+                      selectedChild: _selectedChild,
+                      onChildTap: _chooseChild,
                       onBack: () => Navigator.maybePop(context),
                     ),
                     Expanded(
                       child: _messages.isEmpty
                           ? _WelcomeContent(
+                              selectedChild: _selectedChild,
                               suggestions: _suggestions,
                               onSuggestionTap: _send,
                             )
@@ -131,7 +281,19 @@ class _ChatPageState extends State<ChatPage> {
                               messages: _messages,
                             ),
                     ),
-                    _Composer(controller: _controller, onSend: _send),
+                    if (_pendingAttachments.isNotEmpty)
+                      _PendingAttachmentTray(
+                        attachments: _pendingAttachments,
+                        onRemove: (attachment) => setState(
+                          () => _pendingAttachments.remove(attachment),
+                        ),
+                      ),
+                    _Composer(
+                      controller: _controller,
+                      selectedChild: _selectedChild,
+                      onAttach: _showAttachmentPicker,
+                      onSend: _send,
+                    ),
                   ],
                 ),
               ),
@@ -166,60 +328,117 @@ class _ChatHeader extends StatelessWidget {
   const _ChatHeader({
     required this.title,
     required this.subtitle,
+    required this.selectedChild,
+    required this.onChildTap,
     required this.onBack,
   });
 
   final String title;
   final String subtitle;
+  final ChildProfile? selectedChild;
+  final VoidCallback onChildTap;
   final VoidCallback onBack;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 12, 24, 18),
-      child: Row(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Semantics(
-            button: true,
-            label: 'Back',
-            child: Material(
-              color: Colors.white.withValues(alpha: 0.72),
-              shape: const CircleBorder(
-                side: BorderSide(color: Color(0xCCFFFFFF)),
-              ),
-              elevation: 0,
-              child: InkWell(
-                customBorder: const CircleBorder(),
-                onTap: onBack,
-                child: const SizedBox.square(
-                  dimension: 46,
-                  child: Icon(
-                    Icons.arrow_back_ios_new_rounded,
-                    size: 21,
-                    color: AppColors.navy,
+          Row(
+            children: [
+              Semantics(
+                button: true,
+                label: 'Back',
+                child: Material(
+                  color: Colors.white.withValues(alpha: 0.72),
+                  shape: const CircleBorder(
+                    side: BorderSide(color: Color(0xCCFFFFFF)),
+                  ),
+                  elevation: 0,
+                  child: InkWell(
+                    customBorder: const CircleBorder(),
+                    onTap: onBack,
+                    child: const SizedBox.square(
+                      dimension: 46,
+                      child: Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                        size: 21,
+                        color: AppColors.navy,
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
+              const SizedBox(width: 18),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    Text(
+                      subtitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 18),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.headlineSmall,
+          const SizedBox(height: 10),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Semantics(
+              button: true,
+              label: selectedChild == null
+                  ? 'Choose which child this chat is about'
+                  : 'Change child from ${selectedChild!.name}',
+              child: Material(
+                color: Colors.white.withValues(alpha: 0.78),
+                borderRadius: BorderRadius.circular(18),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(18),
+                  onTap: onChildTap,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(8, 6, 11, 6),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _ChildAvatar(child: selectedChild),
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            selectedChild == null
+                                ? 'Who is this about?'
+                                : 'About ${selectedChild!.name}  ·  ${selectedChild!.age}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: AppColors.navy,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        const Icon(
+                          Icons.keyboard_arrow_down_rounded,
+                          color: AppColors.inkMuted,
+                          size: 19,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                Text(
-                  subtitle,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-              ],
+              ),
             ),
           ),
         ],
@@ -230,10 +449,12 @@ class _ChatHeader extends StatelessWidget {
 
 class _WelcomeContent extends StatelessWidget {
   const _WelcomeContent({
+    required this.selectedChild,
     required this.suggestions,
     required this.onSuggestionTap,
   });
 
+  final ChildProfile? selectedChild;
   final List<_Suggestion> suggestions;
   final ValueChanged<String> onSuggestionTap;
 
@@ -285,7 +506,12 @@ class _WelcomeContent extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 10),
-                        Expanded(child: _WelcomeBubble(compact: compact)),
+                        Expanded(
+                          child: _WelcomeBubble(
+                            compact: compact,
+                            selectedChild: selectedChild,
+                          ),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 14),
@@ -346,9 +572,10 @@ class _WelcomeContent extends StatelessWidget {
 }
 
 class _WelcomeBubble extends StatelessWidget {
-  const _WelcomeBubble({required this.compact});
+  const _WelcomeBubble({required this.compact, required this.selectedChild});
 
   final bool compact;
+  final ChildProfile? selectedChild;
 
   @override
   Widget build(BuildContext context) {
@@ -390,10 +617,11 @@ class _WelcomeBubble extends StatelessWidget {
           ),
           const SizedBox(height: 5),
           Text(
-            'Ask me anything about your child’s health, sleep, development, or parenting.',
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(height: 1.3),
+            selectedChild == null
+                ? 'Choose a child above for personalized context, or ask a general parenting question.'
+                : 'Ask me anything about ${selectedChild!.name}’s health, sleep, development, or parenting.',
+            style: Theme.of(context).textTheme.bodyMedium
+                ?.copyWith(height: 1.3),
           ),
           const SizedBox(height: 7),
           const Icon(
@@ -427,7 +655,10 @@ class _SuggestionRow extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 4, bottom: 11),
-          child: Text('Try asking', style: Theme.of(context).textTheme.labelSmall),
+          child: Text(
+            'Try asking',
+            style: Theme.of(context).textTheme.labelSmall,
+          ),
         ),
         Wrap(
           spacing: 9,
@@ -553,13 +784,25 @@ class _Conversation extends StatelessWidget {
                 ),
               ],
             ),
-            child: Text(
-              message.text,
-              style: TextStyle(
-                color: message.isMine ? AppColors.navy : AppColors.inkMuted,
-                fontSize: 15,
-                height: 1.35,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (message.attachments.isNotEmpty) ...[
+                  _SentAttachments(attachments: message.attachments),
+                  if (message.text.isNotEmpty) const SizedBox(height: 9),
+                ],
+                if (message.text.isNotEmpty)
+                  Text(
+                    message.text,
+                    style: TextStyle(
+                      color: message.isMine
+                          ? AppColors.navy
+                          : AppColors.inkMuted,
+                      fontSize: 15,
+                      height: 1.35,
+                    ),
+                  ),
+              ],
             ),
           ),
         );
@@ -569,9 +812,16 @@ class _Conversation extends StatelessWidget {
 }
 
 class _Composer extends StatelessWidget {
-  const _Composer({required this.controller, required this.onSend});
+  const _Composer({
+    required this.controller,
+    required this.selectedChild,
+    required this.onAttach,
+    required this.onSend,
+  });
 
   final TextEditingController controller;
+  final ChildProfile? selectedChild;
+  final VoidCallback onAttach;
   final VoidCallback onSend;
 
   @override
@@ -600,7 +850,7 @@ class _Composer extends StatelessWidget {
               label: 'Add attachment',
               child: InkWell(
                 customBorder: const CircleBorder(),
-                onTap: () {},
+                onTap: onAttach,
                 child: Container(
                   width: 46,
                   height: 46,
@@ -624,9 +874,14 @@ class _Composer extends StatelessWidget {
                 onSubmitted: (_) => onSend(),
                 textInputAction: TextInputAction.send,
                 style: const TextStyle(color: AppColors.navy, fontSize: 16),
-                decoration: const InputDecoration(
-                  hintText: 'Ask Mother AI anything...',
-                  hintStyle: TextStyle(color: AppColors.inkMuted, fontSize: 16),
+                decoration: InputDecoration(
+                  hintText: selectedChild == null
+                      ? 'Ask Mother AI anything...'
+                      : 'Ask about ${selectedChild!.name}...',
+                  hintStyle: const TextStyle(
+                    color: AppColors.inkMuted,
+                    fontSize: 16,
+                  ),
                   border: InputBorder.none,
                   isCollapsed: true,
                 ),
@@ -669,6 +924,429 @@ class _Composer extends StatelessWidget {
   }
 }
 
+class _PendingAttachmentTray extends StatelessWidget {
+  const _PendingAttachmentTray({
+    required this.attachments,
+    required this.onRemove,
+  });
+
+  final List<ChatAttachment> attachments;
+  final ValueChanged<ChatAttachment> onRemove;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 86,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.fromLTRB(18, 4, 18, 6),
+        itemCount: attachments.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 10),
+        itemBuilder: (context, index) {
+          final attachment = attachments[index];
+          return Stack(
+            clipBehavior: Clip.none,
+            children: [
+              _AttachmentPreview(attachment: attachment, compact: true),
+              Positioned(
+                right: -6,
+                top: -5,
+                child: Semantics(
+                  button: true,
+                  label: 'Remove ${attachment.name}',
+                  child: Material(
+                    color: AppColors.navy,
+                    shape: const CircleBorder(),
+                    child: InkWell(
+                      customBorder: const CircleBorder(),
+                      onTap: () => onRemove(attachment),
+                      child: const SizedBox.square(
+                        dimension: 24,
+                        child: Icon(
+                          Icons.close_rounded,
+                          size: 15,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _SentAttachments extends StatelessWidget {
+  const _SentAttachments({required this.attachments});
+
+  final List<ChatAttachment> attachments;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 7,
+      runSpacing: 7,
+      children: [
+        for (final attachment in attachments)
+          _AttachmentPreview(attachment: attachment),
+      ],
+    );
+  }
+}
+
+class _AttachmentPreview extends StatelessWidget {
+  const _AttachmentPreview({required this.attachment, this.compact = false});
+
+  final ChatAttachment attachment;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    final width = compact ? 72.0 : 164.0;
+    final height = compact ? 72.0 : 120.0;
+    if (attachment.isImage) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(compact ? 14 : 16),
+        child: Image.memory(
+          attachment.bytes,
+          width: width,
+          height: height,
+          fit: BoxFit.cover,
+          errorBuilder: (_, _, _) => _FilePreview(
+            attachment: attachment,
+            width: width,
+            height: height,
+          ),
+        ),
+      );
+    }
+    return _FilePreview(attachment: attachment, width: width, height: height);
+  }
+}
+
+class _FilePreview extends StatelessWidget {
+  const _FilePreview({
+    required this.attachment,
+    required this.width,
+    required this.height,
+  });
+
+  final ChatAttachment attachment;
+  final double width;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      height: height,
+      padding: const EdgeInsets.all(9),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.72),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.line),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(
+            Icons.insert_drive_file_outlined,
+            color: AppColors.lavender,
+            size: 25,
+          ),
+          const SizedBox(height: 5),
+          Text(
+            attachment.name,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: AppColors.navy,
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AttachmentPickerSheet extends StatelessWidget {
+  const _AttachmentPickerSheet({
+    required this.onPhotoLibrary,
+    required this.onCamera,
+    required this.onFile,
+  });
+
+  final VoidCallback onPhotoLibrary;
+  final VoidCallback onCamera;
+  final VoidCallback onFile;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      top: false,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 38,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.line,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 18),
+            Text(
+              'Add to your message',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            const SizedBox(height: 5),
+            Text(
+              'Share a photo or document for more context.',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 18),
+            Row(
+              children: [
+                Expanded(
+                  child: _AttachmentSourceButton(
+                    label: 'Photos',
+                    icon: Icons.photo_library_outlined,
+                    color: AppColors.lavender,
+                    background: const Color(0xFFEEE6FF),
+                    onTap: onPhotoLibrary,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _AttachmentSourceButton(
+                    label: 'Camera',
+                    icon: Icons.photo_camera_outlined,
+                    color: AppColors.coral,
+                    background: const Color(0xFFFCE1DF),
+                    onTap: onCamera,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _AttachmentSourceButton(
+                    label: 'File',
+                    icon: Icons.attach_file_rounded,
+                    color: AppColors.blue,
+                    background: AppColors.sky,
+                    onTap: onFile,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Up to 10 MB per attachment',
+              style: TextStyle(color: AppColors.inkMuted, fontSize: 12),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AttachmentSourceButton extends StatelessWidget {
+  const _AttachmentSourceButton({
+    required this.label,
+    required this.icon,
+    required this.color,
+    required this.background,
+    required this.onTap,
+  });
+
+  final String label;
+  final IconData icon;
+  final Color color;
+  final Color background;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: const Color(0xFFF8F7FB),
+      borderRadius: BorderRadius.circular(18),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          child: Column(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: background,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: color, size: 21),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: AppColors.navy,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ChildAvatar extends StatelessWidget {
+  const _ChildAvatar({required this.child});
+
+  final ChildProfile? child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 29,
+      height: 29,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: child?.avatarBackground ?? const Color(0xFFEEE6FF),
+        shape: BoxShape.circle,
+      ),
+      child: child == null
+          ? const Icon(
+              Icons.person_add_alt_1_rounded,
+              size: 15,
+              color: AppColors.lavender,
+            )
+          : Text(
+              child!.name.substring(0, 1).toUpperCase(),
+              style: const TextStyle(
+                color: AppColors.navy,
+                fontSize: 12.5,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+    );
+  }
+}
+
+class _ChildPickerSheet extends StatelessWidget {
+  const _ChildPickerSheet({required this.selectedChild});
+
+  final ChildProfile? selectedChild;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      top: false,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 38,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.line,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 18),
+            Text(
+              'Who is this chat about?',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            const SizedBox(height: 5),
+            Text(
+              'Mother AI will use their age and profile details as context.',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 16),
+            for (final child in demoChildren)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 9),
+                child: Material(
+                  color: selectedChild?.id == child.id
+                      ? const Color(0xFFF4EFFF)
+                      : const Color(0xFFF8F7FB),
+                  borderRadius: BorderRadius.circular(18),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(18),
+                    onTap: () => Navigator.of(context).pop(child),
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Row(
+                        children: [
+                          _ChildAvatar(child: child),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  child.name,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium,
+                                ),
+                                Text(
+                                  '${child.age} · ${child.birthday}',
+                                  style: Theme.of(context).textTheme.bodyMedium
+                                      ?.copyWith(fontSize: 12.5),
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (selectedChild?.id == child.id)
+                            const Icon(
+                              Icons.check_circle_rounded,
+                              color: AppColors.lavender,
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _Suggestion {
   const _Suggestion({
     required this.label,
@@ -688,8 +1366,25 @@ class _Suggestion {
 }
 
 class ChatMessage {
-  const ChatMessage(this.text, {required this.isMine});
+  const ChatMessage(
+    this.text, {
+    required this.isMine,
+    this.attachments = const [],
+  });
 
   final String text;
   final bool isMine;
+  final List<ChatAttachment> attachments;
+}
+
+class ChatAttachment {
+  const ChatAttachment({
+    required this.name,
+    required this.bytes,
+    required this.isImage,
+  });
+
+  final String name;
+  final Uint8List bytes;
+  final bool isImage;
 }

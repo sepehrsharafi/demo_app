@@ -1,11 +1,11 @@
 {
-    "name": "demo_app",
-    "short_name": "demo_app",
+    "name": "Mother AI",
+    "short_name": "Mother AI",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#FFFCF9",
+    "theme_color": "#9C79E8",
+    "description": "Calm, understandable guidance for mothers and caregivers.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

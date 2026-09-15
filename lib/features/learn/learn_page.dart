@@ -9,7 +9,7 @@ class LearnTab extends StatelessWidget {
 
   static const _featured = _Article(
     category: 'GROWTH',
-    accent: AppColors.green,
+    accent: Color(0xFF6C8E7D),
     title: 'Understanding growth spurts',
     snippet:
         'Why sudden growth and crankiness often go together, and how to '
@@ -22,7 +22,7 @@ class LearnTab extends StatelessWidget {
   static const _articles = <_Article>[
     _Article(
       category: 'HEALTH',
-      accent: Color(0xFFF16468),
+      accent: Color(0xFFB96F72),
       title: 'Fever 101: when to worry',
       snippet: 'What counts as mild, and the signs that mean call the doctor.',
       imagePath: 'assets/images/learn_fever.webp',
@@ -31,7 +31,7 @@ class LearnTab extends StatelessWidget {
     ),
     _Article(
       category: 'SLEEP',
-      accent: Color(0xFF4564E7),
+      accent: Color(0xFF65749B),
       title: 'Building a bedtime routine',
       snippet: 'A simple, repeatable wind-down that helps sleep click.',
       imagePath: 'assets/images/learn_bedtime.webp',
@@ -40,7 +40,7 @@ class LearnTab extends StatelessWidget {
     ),
     _Article(
       category: 'PARENTING',
-      accent: AppColors.coral,
+      accent: Color(0xFFB87564),
       title: 'Positive discipline basics',
       snippet: 'Setting boundaries with warmth instead of power struggles.',
       imagePath: 'assets/images/learn_positive_discipline.webp',
@@ -260,6 +260,8 @@ class _FeaturedArticleCard extends StatelessWidget {
 }
 
 /// A smaller, horizontal card used for every article below the featured one.
+/// The photograph is anchored to the card edge, with only a slight editorial
+/// angle where it meets the article copy.
 class _ArticleCard extends StatelessWidget {
   const _ArticleCard({
     required this.data,
@@ -274,45 +276,35 @@ class _ArticleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.transparent,
-      borderRadius: BorderRadius.circular(28),
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(26),
       clipBehavior: Clip.antiAlias,
       child: Ink(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-            colors: [data.accent.withValues(alpha: 0.06), Colors.white],
-            stops: const [0, 0.5],
-          ),
-          borderRadius: BorderRadius.circular(28),
-          border: Border.all(color: data.accent.withValues(alpha: 0.1)),
+          color: const Color(0xFFFFFEFC),
+          borderRadius: BorderRadius.circular(26),
+          border: Border.all(color: const Color(0xFFECE8E3)),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x0D10265A),
+              blurRadius: 18,
+              offset: Offset(0, 7),
+            ),
+          ],
         ),
         child: InkWell(
           onTap: onTap,
           child: SizedBox(
-            height: 158,
+            height: 164,
             child: Stack(
               children: [
-                Positioned(
-                  right: -30,
-                  top: -48,
-                  child: Container(
-                    width: 112,
-                    height: 112,
-                    decoration: BoxDecoration(
-                      color: data.accent.withValues(alpha: 0.055),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ),
                 Row(
                   children: [
                     SizedBox(
-                      width: 132,
-                      height: 158,
+                      width: 126,
+                      height: double.infinity,
                       child: ClipPath(
-                        clipper: const _EditorialImageClipper(),
+                        clipper: const _AngledImageClipper(),
                         child: Stack(
                           fit: StackFit.expand,
                           children: [
@@ -324,15 +316,15 @@ class _ArticleCard extends StatelessWidget {
                                   end: Alignment.bottomCenter,
                                   colors: [
                                     Colors.transparent,
-                                    Color(0x3D07142E),
+                                    Color(0x2B13213B),
                                   ],
-                                  stops: [0.55, 1],
+                                  stops: [0.64, 1],
                                 ),
                               ),
                             ),
                             Positioned(
-                              left: 12,
-                              top: 12,
+                              left: 10,
+                              bottom: 10,
                               child: _StoryNumber(number: storyNumber),
                             ),
                           ],
@@ -341,7 +333,7 @@ class _ArticleCard extends StatelessWidget {
                     ),
                     Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.fromLTRB(12, 13, 14, 12),
+                        padding: const EdgeInsets.fromLTRB(10, 14, 14, 13),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -356,18 +348,18 @@ class _ArticleCard extends StatelessWidget {
                                   width: 28,
                                   height: 28,
                                   decoration: BoxDecoration(
-                                    color: data.accent,
+                                    color: data.accent.withValues(alpha: 0.1),
                                     shape: BoxShape.circle,
                                   ),
-                                  child: const Icon(
+                                  child: Icon(
                                     Icons.arrow_outward_rounded,
-                                    color: Colors.white,
+                                    color: data.accent,
                                     size: 15,
                                   ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 7),
+                            const SizedBox(height: 8),
                             Text(
                               data.title,
                               maxLines: 1,
@@ -379,7 +371,7 @@ class _ArticleCard extends StatelessWidget {
                                     letterSpacing: -0.3,
                                   ),
                             ),
-                            const SizedBox(height: 3),
+                            const SizedBox(height: 4),
                             Text(
                               data.snippet,
                               maxLines: 2,
@@ -398,12 +390,6 @@ class _ArticleCard extends StatelessWidget {
                       ),
                     ),
                   ],
-                ),
-                Positioned(
-                  left: 132,
-                  right: 0,
-                  bottom: 0,
-                  child: Container(height: 3, color: data.accent),
                 ),
               ],
             ),
@@ -583,19 +569,14 @@ class _StoryNumber extends StatelessWidget {
   }
 }
 
-class _EditorialImageClipper extends CustomClipper<Path> {
-  const _EditorialImageClipper();
+class _AngledImageClipper extends CustomClipper<Path> {
+  const _AngledImageClipper();
 
   @override
   Path getClip(Size size) {
     return Path()
-      ..lineTo(size.width - 18, 0)
-      ..quadraticBezierTo(
-        size.width + 10,
-        size.height * 0.47,
-        size.width - 8,
-        size.height,
-      )
+      ..lineTo(size.width - 12, 0)
+      ..lineTo(size.width, size.height)
       ..lineTo(0, size.height)
       ..close();
   }

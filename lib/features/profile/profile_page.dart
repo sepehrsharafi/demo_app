@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/models/child_profile.dart';
 import '../../core/theme/app_theme.dart';
 
 /// The Profile tab: account, children, preferences, privacy, support and
@@ -15,21 +16,6 @@ class _ProfileTabState extends State<ProfileTab> {
   bool _pushNotifications = true;
   bool _dailyTips = true;
   bool _weeklySummary = false;
-
-  static const _children = <_ChildEntry>[
-    _ChildEntry(
-      name: 'Emma',
-      age: '6 months old',
-      birthday: 'Born 14 Mar 2026',
-      background: Color(0xFFFCE1DF),
-    ),
-    _ChildEntry(
-      name: 'Daniel',
-      age: '2 years old',
-      birthday: 'Born 2 May 2024',
-      background: Color(0xFFE3E7FB),
-    ),
-  ];
 
   void _showMessage(String message) {
     ScaffoldMessenger.of(context)
@@ -74,14 +60,9 @@ class _ProfileTabState extends State<ProfileTab> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(22),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
         title: Text(title, style: Theme.of(context).textTheme.titleMedium),
-        content: Text(
-          message,
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
+        content: Text(message, style: Theme.of(context).textTheme.bodyMedium),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -114,9 +95,7 @@ class _ProfileTabState extends State<ProfileTab> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(22),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
         title: Text(
           'Medical disclaimer',
           style: Theme.of(context).textTheme.titleMedium,
@@ -191,7 +170,7 @@ class _ProfileTabState extends State<ProfileTab> {
                         const _GroupLabel('YOUR CHILDREN'),
                         _SettingsGroup(
                           children: [
-                            for (final child in _children)
+                            for (final child in demoChildren)
                               _SettingsRow(
                                 leading: _ChildAvatar(data: child),
                                 title: child.name,
@@ -444,16 +423,14 @@ class _AccountCard extends StatelessWidget {
                     'sarah.mitchell@email.com',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodyMedium?.copyWith(fontSize: 13),
+                    style: Theme.of(context).textTheme.bodyMedium
+                        ?.copyWith(fontSize: 13),
                   ),
                   const SizedBox(height: 6),
                   Text(
                     'Member since March 2026',
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodyMedium?.copyWith(fontSize: 11.5),
+                    style: Theme.of(context).textTheme.bodyMedium
+                        ?.copyWith(fontSize: 11.5),
                   ),
                 ],
               ),
@@ -704,9 +681,8 @@ class _SettingsRow extends StatelessWidget {
                       subtitle!,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: Theme.of(
-                        context,
-                      ).textTheme.bodyMedium?.copyWith(fontSize: 12),
+                      style: Theme.of(context).textTheme.bodyMedium
+                          ?.copyWith(fontSize: 12),
                     ),
                   ],
                 ],
@@ -716,9 +692,8 @@ class _SettingsRow extends StatelessWidget {
               const SizedBox(width: 10),
               Text(
                 value!,
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.copyWith(fontSize: 13.5),
+                style: Theme.of(context).textTheme.bodyMedium
+                    ?.copyWith(fontSize: 13.5),
               ),
             ],
             const SizedBox(width: 6),
@@ -756,7 +731,7 @@ class _RowSwitch extends StatelessWidget {
 class _ChildAvatar extends StatelessWidget {
   const _ChildAvatar({required this.data});
 
-  final _ChildEntry data;
+  final ChildProfile data;
 
   @override
   Widget build(BuildContext context) {
@@ -765,7 +740,7 @@ class _ChildAvatar extends StatelessWidget {
       height: 34,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: data.background,
+        color: data.avatarBackground,
         shape: BoxShape.circle,
       ),
       child: Text(
@@ -809,11 +784,7 @@ class _SignOutButton extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.logout_rounded,
-                    color: AppColors.coral,
-                    size: 18,
-                  ),
+                  Icon(Icons.logout_rounded, color: AppColors.coral, size: 18),
                   SizedBox(width: 8),
                   Text(
                     'Sign out',
@@ -851,18 +822,4 @@ class _ProfileBackground extends StatelessWidget {
       ),
     );
   }
-}
-
-class _ChildEntry {
-  const _ChildEntry({
-    required this.name,
-    required this.age,
-    required this.birthday,
-    required this.background,
-  });
-
-  final String name;
-  final String age;
-  final String birthday;
-  final Color background;
 }

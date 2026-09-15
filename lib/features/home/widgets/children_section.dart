@@ -1,24 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/models/child_profile.dart';
 import '../../../core/theme/app_theme.dart';
-
-class ChildData {
-  const ChildData({
-    required this.name,
-    required this.lastChatDate,
-    required this.lastMessage,
-    required this.avatarBackground,
-    required this.cardStart,
-    required this.cardEnd,
-  });
-
-  final String name;
-  final String lastChatDate;
-  final String lastMessage;
-  final Color avatarBackground;
-  final Color cardStart;
-  final Color cardEnd;
-}
 
 class ChildrenSection extends StatelessWidget {
   const ChildrenSection({
@@ -27,8 +10,8 @@ class ChildrenSection extends StatelessWidget {
     required this.onChildTap,
   });
 
-  final List<ChildData> children;
-  final ValueChanged<ChildData> onChildTap;
+  final List<ChildProfile> children;
+  final ValueChanged<ChildProfile> onChildTap;
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +29,7 @@ class ChildrenSection extends StatelessWidget {
 class _ChildCard extends StatelessWidget {
   const _ChildCard({required this.data, required this.onTap});
 
-  final ChildData data;
+  final ChildProfile data;
   final VoidCallback onTap;
 
   @override

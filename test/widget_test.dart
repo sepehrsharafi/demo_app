@@ -96,10 +96,7 @@ void main() {
 
     Future<void> tapTab(String label) async {
       await tester.tap(
-        find.descendant(
-          of: find.byType(AppNavBar),
-          matching: find.text(label),
-        ),
+        find.descendant(of: find.byType(AppNavBar), matching: find.text(label)),
       );
       await tester.pumpAndSettle();
     }
@@ -138,6 +135,74 @@ void main() {
     expect(find.bySemanticsLabel('Back'), findsOneWidget);
     // The active conversation is immersive: no bottom navigation on screen.
     expect(find.bySemanticsLabel('Profile'), findsNothing);
+  });
+
+  testWidgets('a chat can select and visibly retain child context', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const MotherlyApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Chat'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Start a new chat'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Who is this about?'), findsOneWidget);
+    await tester.tap(find.text('Who is this about?'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Who is this chat about?'), findsOneWidget);
+    expect(find.textContaining('profile details as context'), findsOneWidget);
+    await tester.tap(find.text('Emma').last);
+    await tester.pumpAndSettle();
+
+    expect(find.text('About Emma  ·  6 months old'), findsOneWidget);
+    expect(find.widgetWithText(TextField, 'Ask about Emma...'), findsOneWidget);
+  });
+
+  testWidgets('the chat attachment button offers media and file sources', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const MotherlyApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Chat'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Start a new chat'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.bySemanticsLabel('Add attachment'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Add to your message'), findsOneWidget);
+    expect(find.text('Photos'), findsOneWidget);
+    expect(find.text('Camera'), findsOneWidget);
+    expect(find.text('File'), findsOneWidget);
+    expect(find.text('Up to 10 MB per attachment'), findsOneWidget);
+  });
+
+  testWidgets('tapping a child on Home opens a chat about that child', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const MotherlyApp());
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.descendant(of: find.byType(HomeTab), matching: find.text('Daniel')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('About Daniel  ·  2 years old'), findsOneWidget);
+    expect(find.textContaining('about Daniel’s health'), findsOneWidget);
   });
 
   testWidgets('deleting the account asks for confirmation first', (
