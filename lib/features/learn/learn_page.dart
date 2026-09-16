@@ -148,6 +148,10 @@ class _FeaturedArticleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final imageCacheWidth =
+        (MediaQuery.sizeOf(context).width *
+                MediaQuery.devicePixelRatioOf(context))
+            .ceil();
     return Material(
       color: Colors.white,
       shape: RoundedRectangleBorder(
@@ -161,6 +165,7 @@ class _FeaturedArticleCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(
+              width: double.infinity,
               height: 245,
               child: ClipPath(
                 clipper: const _FeatureImageClipper(),
@@ -168,6 +173,7 @@ class _FeaturedArticleCard extends StatelessWidget {
                   data.imagePath,
                   fit: BoxFit.cover,
                   alignment: const Alignment(0.3, -0.12),
+                  cacheWidth: imageCacheWidth,
                 ),
               ),
             ),
@@ -304,6 +310,8 @@ class _ArticleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final imageCacheWidth = (126 * MediaQuery.devicePixelRatioOf(context))
+        .ceil();
     return Material(
       color: Colors.white,
       borderRadius: BorderRadius.circular(26),
@@ -337,7 +345,11 @@ class _ArticleCard extends StatelessWidget {
                         child: Stack(
                           fit: StackFit.expand,
                           children: [
-                            Image.asset(data.imagePath, fit: BoxFit.cover),
+                            Image.asset(
+                              data.imagePath,
+                              fit: BoxFit.cover,
+                              cacheWidth: imageCacheWidth,
+                            ),
                             const DecoratedBox(
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(

@@ -277,6 +277,9 @@ class _HistoryHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final imageCacheWidth = (300 * MediaQuery.devicePixelRatioOf(context))
+        .round()
+        .clamp(1, 1774);
     return Padding(
       padding: const EdgeInsets.fromLTRB(18, 18, 0, 16),
       child: Semantics(
@@ -297,6 +300,7 @@ class _HistoryHeader extends StatelessWidget {
                   fit: BoxFit.cover,
                   alignment: Alignment.centerRight,
                   filterQuality: FilterQuality.high,
+                  cacheWidth: imageCacheWidth,
                   excludeFromSemantics: true,
                 ),
               ),

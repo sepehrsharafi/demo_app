@@ -15,9 +15,16 @@ class HeroSection extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final compact = constraints.maxWidth < 380;
+        final imageCacheWidth =
+            (constraints.maxWidth * MediaQuery.devicePixelRatioOf(context))
+                .ceil()
+                .clamp(1, 1672);
 
         return SizedBox(
-          height: topInset + (compact ? 242 : 250),
+          // Leave enough room for the final heart mark. The copy stack was
+          // slightly taller than the hero on common phone widths, so the
+          // Stack's default hard clip shaved the icon at its lower edge.
+          height: topInset + (compact ? 266 : 272),
           child: Stack(
             children: [
               Positioned.fill(
@@ -26,6 +33,7 @@ class HeroSection extends StatelessWidget {
                   fit: BoxFit.cover,
                   alignment: Alignment.center,
                   filterQuality: FilterQuality.high,
+                  cacheWidth: imageCacheWidth,
                 ),
               ),
               // The illustration is cover-cropped, so how much of its two
@@ -148,9 +156,7 @@ class _HeroCopy extends StatelessWidget {
         // (and the gradient one) quietly drifted to its own number.
         Text(
           'Here for\nevery question',
-          style: textTheme.displayLarge?.copyWith(
-            fontSize: compact ? 30 : 32,
-          ),
+          style: textTheme.displayLarge?.copyWith(fontSize: compact ? 30 : 32),
         ),
         ShaderMask(
           blendMode: BlendMode.srcIn,
@@ -170,9 +176,7 @@ class _HeroCopy extends StatelessWidget {
         SizedBox(height: compact ? 12 : 15),
         Text(
           'Real answers. Kinder days.\nBrighter tomorrows.',
-          style: textTheme.bodyLarge?.copyWith(
-            fontSize: compact ? 15 : 16,
-          ),
+          style: textTheme.bodyLarge?.copyWith(fontSize: compact ? 15 : 16),
         ),
         const SizedBox(height: 11),
         SvgPicture.asset(

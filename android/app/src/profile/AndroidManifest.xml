@@ -4,4 +4,17 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
+
+    <application>
+        <!-- The Android emulator's OpenGLES driver currently aborts inside
+             Impeller's blit pass, so local emulator runs fall back to Skia.
+             This is scoped to debug/profile on purpose: release builds must
+             stay on Impeller, which compiles its shaders ahead of time. On
+             Skia the first run of an animation stalls the raster thread while
+             the driver compiles shaders, which is only smooth the second time.
+             Remove this once the engine/driver path is fixed. -->
+        <meta-data
+            android:name="io.flutter.embedding.android.EnableImpeller"
+            android:value="false" />
+    </application>
 </manifest>

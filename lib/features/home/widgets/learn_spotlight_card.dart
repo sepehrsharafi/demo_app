@@ -13,6 +13,11 @@ class LearnSpotlightCard extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final compact = constraints.maxWidth < 360;
+        final imageCacheWidth =
+            (constraints.maxWidth *
+                    (compact ? 0.42 : 0.46) *
+                    MediaQuery.devicePixelRatioOf(context))
+                .ceil();
 
         return Material(
           color: Colors.white,
@@ -42,6 +47,7 @@ class LearnSpotlightCard extends StatelessWidget {
                           fit: BoxFit.cover,
                           alignment: const Alignment(0.55, -0.05),
                           filterQuality: FilterQuality.high,
+                          cacheWidth: imageCacheWidth,
                         ),
                       ),
                     ),

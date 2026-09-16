@@ -40,7 +40,11 @@ abstract final class AppTheme {
       fontFamily: 'Urbanist',
       colorScheme: scheme,
       scaffoldBackgroundColor: AppColors.background,
-      splashFactory: InkSparkle.splashFactory,
+      // InkSparkle compiles a fragment shader the first time it is used. That
+      // one-off cost landed on the first navigation tap when running with the
+      // Skia/OpenGLES fallback. InkRipple keeps tactile feedback without a
+      // first-use shader compilation hitch.
+      splashFactory: InkRipple.splashFactory,
       // Pushing a conversation should glide rather than snap. iOS keeps its
       // native slide (so the edge-swipe back gesture still reads correctly);
       // everywhere else uses Material's gentler fade-forwards motion.

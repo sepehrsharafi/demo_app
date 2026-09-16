@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../features/chat/chat_history_page.dart';
@@ -15,10 +17,10 @@ import 'app_nav_bar.dart';
 /// switches. An inactive tab sits at zero opacity, which the renderer skips
 /// painting entirely, so the resting cost matches an [IndexedStack].
 ///
-/// Each tab rests one page-width away on the side where it lives, so
-/// a tab to the right of the current one slides in from the right and a tab to
-/// the left slides in from the left — matching the order of the nav bar itself,
-/// with the two page edges joined throughout the movement.
+/// Tabs rest one page away on the side where they live. Switching uses only a
+/// retained-layer translation: no blur, scale, or full-screen alpha blending.
+/// This keeps the nav bar's spatial order clear while remaining inexpensive on
+/// Android devices using the OpenGLES Impeller backend.
 class AppShell extends StatefulWidget {
   const AppShell({super.key});
 
@@ -29,6 +31,7 @@ class AppShell extends StatefulWidget {
 class _AppShellState extends State<AppShell> {
   int _selectedIndex = 0;
   late final List<Widget> _tabs;
+  bool _visualWarmUpScheduled = false;
 
   @override
   void initState() {
@@ -43,6 +46,64 @@ class _AppShellState extends State<AppShell> {
       const LearnTab(),
       const ProfileTab(),
     ];
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_visualWarmUpScheduled) return;
+    _visualWarmUpScheduled = true;
+
+    // Let Home win the first frame, then decode the images used by the other
+    // tabs and the pushed chat screen before a transition needs to paint them.
+    // Using the same ResizeImage keys as the widgets is important: warming the
+    // original asset alone would still leave Flutter to perform the resized
+    // decode on first navigation.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) unawaited(_warmVisualAssets());
+    });
+  }
+
+  Future<void> _warmVisualAssets() async {
+    final mediaQuery = MediaQuery.of(context);
+    final pixelRatio = mediaQuery.devicePixelRatio;
+    final screenWidth = mediaQuery.size.width;
+    final fullWidth = (screenWidth * pixelRatio).ceil();
+    final articleThumbnailWidth = (126 * pixelRatio).ceil();
+    final chatHeaderWidth = (300 * pixelRatio).round().clamp(1, 1774);
+
+    final images = <ImageProvider<Object>>[
+      // Highest priority: this otherwise decodes while the chat route is
+      // already animating in.
+      const AssetImage('assets/images/chat_watercolor_background.png'),
+      ResizeImage.resizeIfNeeded(
+        chatHeaderWidth,
+        null,
+        const AssetImage('assets/images/chat_header_botanical_transparent.png'),
+      ),
+      ResizeImage.resizeIfNeeded(
+        fullWidth,
+        null,
+        const AssetImage('assets/images/learn_growth_feature.webp'),
+      ),
+      for (final path in const [
+        'assets/images/learn_fever.webp',
+        'assets/images/learn_bedtime.webp',
+        'assets/images/learn_positive_discipline.webp',
+      ])
+        ResizeImage.resizeIfNeeded(
+          articleThumbnailWidth,
+          null,
+          AssetImage(path),
+        ),
+    ];
+
+    // Decode sequentially. A concurrent burst can itself steal enough CPU and
+    // memory bandwidth to make an early user interaction miss a frame.
+    for (final image in images) {
+      if (!mounted) return;
+      await precacheImage(image, context, onError: (_, _) {});
+    }
   }
 
   void _switchTab(int index) {
@@ -112,13 +173,12 @@ class _TabTransition extends StatefulWidget {
 
 class _TabTransitionState extends State<_TabTransition>
     with SingleTickerProviderStateMixin {
-  static const _duration = Duration(milliseconds: 320);
+  static const _duration = Duration(milliseconds: 270);
   static const _pageOffset = 1.0;
 
-  /// Both pages must follow the same progress curve. If the entering page is
-  /// eased faster than the outgoing one, it overlaps and appears to cover it
-  /// instead of physically taking its place.
-  static const Curve _movementCurve = Cubic(0.40, 0.0, 0.20, 1.0);
+  /// A quick initial response with a long, controlled settle. Unlike a spring,
+  /// it never overshoots and therefore never resamples or exposes page edges.
+  static const Curve _transitionCurve = Cubic(0.32, 0.72, 0.0, 1.0);
 
   late final AnimationController _controller;
   late Animation<Offset> _position;
@@ -179,7 +239,7 @@ class _TabTransitionState extends State<_TabTransition>
     _position = Tween<Offset>(
       begin: currentPosition,
       end: _active ? Offset.zero : _restingPosition(widget.direction),
-    ).animate(CurvedAnimation(parent: _controller, curve: _movementCurve));
+    ).animate(CurvedAnimation(parent: _controller, curve: _transitionCurve));
     _controller.forward(from: 0);
   }
 
@@ -203,6 +263,8 @@ class _TabTransitionState extends State<_TabTransition>
         child: SlideTransition(
           position: _position,
           child: FadeTransition(
+            // A stopped 1/0 animation lets the renderer skip fully hidden tabs
+            // without creating an animated full-screen opacity layer.
             opacity: AlwaysStoppedAnimation(_visible ? 1 : 0),
             child: RepaintBoundary(
               // With no animated scale around this boundary, Flutter can
