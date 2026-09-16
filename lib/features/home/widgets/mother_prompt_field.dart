@@ -24,7 +24,7 @@ class _MotherPromptFieldState extends State<MotherPromptField> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 64,
+      constraints: const BoxConstraints(minHeight: 64),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.92),
         borderRadius: BorderRadius.circular(27),

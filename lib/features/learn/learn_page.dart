@@ -101,19 +101,31 @@ class LearnTab extends StatelessWidget {
                               _showComingSoon(context, _featured.title),
                         ),
                         const SizedBox(height: 28),
-                        Row(
-                          children: [
-                            Text(
-                              'More to explore',
-                              style: textTheme.titleMedium?.copyWith(
-                                fontSize: 15,
+                        LayoutBuilder(
+                          builder: (context, constraints) => Row(
+                            children: [
+                              ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxWidth: constraints.maxWidth - 12,
+                                ),
+                                child: Text(
+                                  'More to explore',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: textTheme.titleMedium?.copyWith(
+                                    fontSize: 15,
+                                  ),
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 12),
-                            const Expanded(
-                              child: Divider(color: AppColors.line, height: 1),
-                            ),
-                          ],
+                              const SizedBox(width: 12),
+                              const Expanded(
+                                child: Divider(
+                                  color: AppColors.line,
+                                  height: 1,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                         const SizedBox(height: 14),
                         for (var i = 0; i < _articles.length; i++) ...[
@@ -148,129 +160,145 @@ class _FeaturedArticleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final imageCacheWidth =
-        (MediaQuery.sizeOf(context).width *
-                MediaQuery.devicePixelRatioOf(context))
-            .ceil();
-    return Material(
-      color: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(30),
-        side: const BorderSide(color: AppColors.line),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: double.infinity,
-              height: 245,
-              child: ClipPath(
-                clipper: const _FeatureImageClipper(),
-                child: Image.asset(
-                  data.imagePath,
-                  fit: BoxFit.cover,
-                  alignment: const Alignment(0.3, -0.12),
-                  cacheWidth: imageCacheWidth,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 5, 20, 19),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        'Editor’s selection',
-                        style: Theme.of(context).textTheme.labelMedium
-                            ?.copyWith(color: data.accent, fontSize: 12.5),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Text(
-                          '${data.source}  ·  ${data.readTime}',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.end,
-                          style: const TextStyle(
-                            color: AppColors.inkMuted,
-                            fontSize: 10.5,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final imageCacheWidth =
+            (constraints.maxWidth * MediaQuery.devicePixelRatioOf(context))
+                .ceil();
+        return Material(
+          color: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+            side: const BorderSide(color: AppColors.line),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: onTap,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                AspectRatio(
+                  aspectRatio: 354 / 245,
+                  child: ClipPath(
+                    clipper: const _FeatureImageClipper(),
+                    child: Image.asset(
+                      data.imagePath,
+                      fit: BoxFit.cover,
+                      alignment: const Alignment(0.3, -0.12),
+                      cacheWidth: imageCacheWidth,
+                    ),
                   ),
-                  const SizedBox(height: 11),
-                  Row(
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 5, 20, 19),
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        width: 3,
-                        height: 67,
-                        margin: const EdgeInsets.only(top: 2, right: 13),
-                        decoration: BoxDecoration(
-                          color: data.accent,
-                          borderRadius: BorderRadius.circular(99),
-                        ),
-                      ),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                      LayoutBuilder(
+                        builder: (context, constraints) => Row(
                           children: [
-                            Text(
-                              data.title,
-                              style: Theme.of(context).textTheme.headlineSmall
-                                  ?.copyWith(
-                                    fontSize: 29,
-                                    height: 1,
-                                    letterSpacing: -0.95,
-                                  ),
+                            ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxWidth: constraints.maxWidth - 16,
+                              ),
+                              child: Text(
+                                'Editor’s selection',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: Theme.of(context).textTheme.labelMedium
+                                    ?.copyWith(
+                                      color: data.accent,
+                                      fontSize: 12.5,
+                                    ),
+                              ),
                             ),
-                            const SizedBox(height: 8),
-                            Text(
-                              data.snippet,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context).textTheme.bodyMedium
-                                  ?.copyWith(fontSize: 13, height: 1.32),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Text(
+                                '${data.source}  ·  ${data.readTime}',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.end,
+                                style: const TextStyle(
+                                  color: AppColors.inkMuted,
+                                  fontSize: 10.5,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                             ),
                           ],
                         ),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 15),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        'Read the story',
-                        style: Theme.of(context).textTheme.labelMedium
-                            ?.copyWith(
-                              color: AppColors.navy,
-                              fontStyle: FontStyle.normal,
-                              fontSize: 12.5,
+                      const SizedBox(height: 11),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: 3,
+                            height: 67,
+                            margin: const EdgeInsets.only(top: 2, right: 13),
+                            decoration: BoxDecoration(
+                              color: data.accent,
+                              borderRadius: BorderRadius.circular(99),
                             ),
+                          ),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  data.title,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineSmall
+                                      ?.copyWith(
+                                        fontSize: 29,
+                                        height: 1,
+                                        letterSpacing: -0.95,
+                                      ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  data.snippet,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(context).textTheme.bodyMedium
+                                      ?.copyWith(fontSize: 13, height: 1.32),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 7),
-                      const Icon(
-                        Icons.arrow_forward_rounded,
-                        color: AppColors.green,
-                        size: 17,
+                      const SizedBox(height: 15),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            'Read the story',
+                            style: Theme.of(context).textTheme.labelMedium
+                                ?.copyWith(
+                                  color: AppColors.navy,
+                                  fontStyle: FontStyle.normal,
+                                  fontSize: 12.5,
+                                ),
+                          ),
+                          const SizedBox(width: 7),
+                          const Icon(
+                            Icons.arrow_forward_rounded,
+                            color: AppColors.green,
+                            size: 17,
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
@@ -310,36 +338,39 @@ class _ArticleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final imageCacheWidth = (126 * MediaQuery.devicePixelRatioOf(context))
-        .ceil();
-    return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(26),
-      clipBehavior: Clip.antiAlias,
-      child: Ink(
-        decoration: BoxDecoration(
-          color: const Color(0xFFFFFEFC),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final imageWidth = constraints.maxWidth * 126 / 354;
+        final imageCacheWidth =
+            (imageWidth * MediaQuery.devicePixelRatioOf(context)).ceil();
+        return Material(
+          color: Colors.white,
           borderRadius: BorderRadius.circular(26),
-          border: Border.all(color: const Color(0xFFECE8E3)),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x0D10265A),
-              blurRadius: 18,
-              offset: Offset(0, 7),
+          clipBehavior: Clip.antiAlias,
+          child: Ink(
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFFEFC),
+              borderRadius: BorderRadius.circular(26),
+              border: Border.all(color: const Color(0xFFECE8E3)),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x0D10265A),
+                  blurRadius: 18,
+                  offset: Offset(0, 7),
+                ),
+              ],
             ),
-          ],
-        ),
-        child: InkWell(
-          onTap: onTap,
-          child: SizedBox(
-            height: 164,
-            child: Stack(
-              children: [
-                Row(
+            child: InkWell(
+              onTap: onTap,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 164),
+                child: Stack(
                   children: [
-                    SizedBox(
-                      width: 126,
-                      height: double.infinity,
+                    Positioned(
+                      left: 0,
+                      top: 0,
+                      bottom: 0,
+                      width: imageWidth,
                       child: ClipPath(
                         clipper: const _AngledImageClipper(),
                         child: Stack(
@@ -367,71 +398,96 @@ class _ArticleCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Expanded(
+                    Padding(
+                      padding: EdgeInsets.only(left: imageWidth),
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(10, 14, 14, 13),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                _CategoryTag(
-                                  text: data.category,
-                                  color: data.accent,
-                                ),
-                                const Spacer(),
-                                Container(
-                                  width: 28,
-                                  height: 28,
-                                  decoration: BoxDecoration(
-                                    color: data.accent.withValues(alpha: 0.1),
-                                    shape: BoxShape.circle,
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(minHeight: 137),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  LayoutBuilder(
+                                    builder: (context, constraints) => Row(
+                                      children: [
+                                        ConstrainedBox(
+                                          constraints: BoxConstraints(
+                                            maxWidth: constraints.maxWidth - 28,
+                                          ),
+                                          child: _CategoryTag(
+                                            text: data.category,
+                                            color: data.accent,
+                                          ),
+                                        ),
+                                        const Spacer(),
+                                        Container(
+                                          width: 28,
+                                          height: 28,
+                                          decoration: BoxDecoration(
+                                            color: data.accent.withValues(
+                                              alpha: 0.1,
+                                            ),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Icon(
+                                            Icons.arrow_outward_rounded,
+                                            color: data.accent,
+                                            size: 15,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                  child: Icon(
-                                    Icons.arrow_outward_rounded,
-                                    color: data.accent,
-                                    size: 15,
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    data.title,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium
+                                        ?.copyWith(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                          letterSpacing: -0.3,
+                                        ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              data.title,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context).textTheme.titleMedium
-                                  ?.copyWith(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    letterSpacing: -0.3,
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    data.snippet,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(
+                                          fontSize: 11.7,
+                                          height: 1.25,
+                                        ),
                                   ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              data.snippet,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context).textTheme.bodyMedium
-                                  ?.copyWith(fontSize: 11.7, height: 1.25),
-                            ),
-                            const Spacer(),
-                            _SourceLine(
-                              source: data.source,
-                              readTime: data.readTime,
-                              color: data.accent,
-                            ),
-                          ],
+                                ],
+                              ),
+                              _SourceLine(
+                                source: data.source,
+                                readTime: data.readTime,
+                                color: data.accent,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
@@ -453,6 +509,8 @@ class _CategoryTag extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         child: Text(
           text,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             color: color,
             fontSize: 9.5,
@@ -478,52 +536,59 @@ class _SourceLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 18,
-          height: 18,
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.12),
-            shape: BoxShape.circle,
+    return LayoutBuilder(
+      builder: (context, constraints) => Row(
+        children: [
+          Container(
+            width: 18,
+            height: 18,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.12),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.public_rounded, color: color, size: 11),
           ),
-          child: Icon(Icons.public_rounded, color: color, size: 11),
-        ),
-        const SizedBox(width: 6),
-        Flexible(
-          child: Text.rich(
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            TextSpan(
-              children: [
-                const TextSpan(text: 'From  '),
-                TextSpan(
-                  text: source,
-                  style: const TextStyle(
-                    color: AppColors.navy,
-                    fontWeight: FontWeight.w700,
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text.rich(
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              TextSpan(
+                children: [
+                  const TextSpan(text: 'From  '),
+                  TextSpan(
+                    text: source,
+                    style: const TextStyle(
+                      color: AppColors.navy,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
-                ),
-              ],
-            ),
-            style: const TextStyle(
-              color: AppColors.inkMuted,
-              fontSize: 9.5,
-              fontWeight: FontWeight.w600,
+                ],
+              ),
+              style: const TextStyle(
+                color: AppColors.inkMuted,
+                fontSize: 9.5,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
-        ),
-        const SizedBox(width: 5),
-        Text(
-          readTime.toUpperCase(),
-          style: const TextStyle(
-            color: AppColors.inkMuted,
-            fontSize: 8.5,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0.65,
+          const SizedBox(width: 5),
+          ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: constraints.maxWidth - 29),
+            child: Text(
+              readTime.toUpperCase(),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: AppColors.inkMuted,
+                fontSize: 8.5,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.65,
+              ),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

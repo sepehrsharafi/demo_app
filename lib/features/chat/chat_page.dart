@@ -829,7 +829,7 @@ class _Composer extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(14, 8, 14, 12),
       child: Container(
-        height: 66,
+        constraints: const BoxConstraints(minHeight: 66),
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.88),
           borderRadius: BorderRadius.circular(33),

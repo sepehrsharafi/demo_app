@@ -277,16 +277,16 @@ class _HistoryHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final imageCacheWidth = (300 * MediaQuery.devicePixelRatioOf(context))
+    final imageCacheWidth = (210 * MediaQuery.devicePixelRatioOf(context))
         .round()
         .clamp(1, 1774);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(18, 18, 0, 16),
+      padding: const EdgeInsets.fromLTRB(18, 18, 0, 12),
       child: Semantics(
         container: true,
-        label: 'Chats. Continue where you left off. Small questions, brighter tomorrows.',
+        label: 'Chats. Continue where you left off.',
         child: SizedBox(
-          height: 148,
+          height: 102,
           child: Stack(
             fit: StackFit.expand,
             children: [
@@ -294,19 +294,20 @@ class _HistoryHeader extends StatelessWidget {
                 top: 0,
                 right: 0,
                 bottom: 0,
-                width: 300,
+                width: 210,
                 child: Image.asset(
                   'assets/images/chat_header_botanical_transparent.png',
-                  fit: BoxFit.cover,
+                  fit: BoxFit.contain,
                   alignment: Alignment.centerRight,
                   filterQuality: FilterQuality.high,
                   cacheWidth: imageCacheWidth,
                   excludeFromSemantics: true,
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(top: 4),
+              Align(
+                alignment: Alignment.centerLeft,
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     ExcludeSemantics(
@@ -317,37 +318,6 @@ class _HistoryHeader extends StatelessWidget {
                       child: Text(
                         'Continue where you left off.',
                         style: textTheme.bodyLarge,
-                      ),
-                    ),
-                    const Spacer(),
-                    ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 300),
-                      child: const ExcludeSemantics(
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.auto_awesome_rounded,
-                              size: 14,
-                              color: AppColors.lavender,
-                            ),
-                            SizedBox(width: 7),
-                            Flexible(
-                              child: Text(
-                                'Small questions. Brighter tomorrows.',
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: AppColors.whisper,
-                                  fontSize: 12.5,
-                                  height: 1.1,
-                                  fontStyle: FontStyle.italic,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
                       ),
                     ),
                   ],
@@ -370,7 +340,7 @@ class _SearchField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 58,
+      constraints: const BoxConstraints(minHeight: 58),
       padding: const EdgeInsets.symmetric(horizontal: 18),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.9),
