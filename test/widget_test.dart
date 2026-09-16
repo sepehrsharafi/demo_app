@@ -27,6 +27,27 @@ void main() {
     expect(find.byKey(const Key('motherPromptField')), findsOneWidget);
   });
 
+  testWidgets('home keyboard does not lift the persistent navigation', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const MotherlyApp());
+    await tester.pumpAndSettle();
+
+    final navBottomBefore = tester.getBottomLeft(find.byType(AppNavBar)).dy;
+    await tester.tap(find.byKey(const Key('motherPromptField')));
+    tester.view.viewInsets = const FakeViewPadding(bottom: 900);
+    await tester.pumpAndSettle();
+
+    final navBottomWithKeyboard = tester
+        .getBottomLeft(find.byType(AppNavBar))
+        .dy;
+    expect(navBottomWithKeyboard, navBottomBefore);
+  });
+
   testWidgets('chat tab opens conversation history with a new-chat action', (
     tester,
   ) async {
@@ -68,7 +89,7 @@ void main() {
     expect(find.text('Good morning', skipOffstage: false), findsOneWidget);
   });
 
-  testWidgets('tabs fade both ways, so you can get back to a previous tab', (
+  testWidgets('tabs slide both ways, so you can get back to a previous tab', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(1170, 2532);
@@ -78,10 +99,9 @@ void main() {
     await tester.pumpWidget(const MotherlyApp());
     await tester.pumpAndSettle();
 
-    // Read the *rendered* opacity, not the requested one: a frozen fade still
-    // reports the right target while painting the old tab over everything.
-    // `.first` = the shell's own fade for that tab; a tab's content may hold
-    // fades of its own further down (Home's entrance animation, for one).
+    // Read the shell's rendered visibility after the slide finishes. A tab's
+    // content may hold fades of its own further down (Home's entrance
+    // animation, for one).
     double opacityOf(int tabIndex) => tester
         .widget<FadeTransition>(
           find
@@ -108,10 +128,29 @@ void main() {
     expect(opacityOf(0), 0);
 
     // Going back is the direction that regressed: the outgoing tab has to
-    // actually finish fading out or it stays stacked on top of the new one.
+    // become hidden after its slide or it stays stacked on top of the new one.
     await tapTab('Home');
     expect(opacityOf(0), 1);
     expect(opacityOf(1), 0);
+  });
+
+  testWidgets('system back returns a secondary tab to Home', (tester) async {
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const MotherlyApp());
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.descendant(of: find.byType(AppNavBar), matching: find.text('Learn')),
+    );
+    await tester.pumpAndSettle();
+    expect(tester.widget<AppNavBar>(find.byType(AppNavBar)).selectedIndex, 2);
+
+    expect(await tester.binding.handlePopRoute(), isTrue);
+    await tester.pumpAndSettle();
+
+    expect(tester.widget<AppNavBar>(find.byType(AppNavBar)).selectedIndex, 0);
   });
 
   testWidgets('starting a new chat opens the immersive chat without a navbar', (

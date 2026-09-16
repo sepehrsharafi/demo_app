@@ -97,8 +97,7 @@ class _AppNavBarState extends State<AppNavBar>
   }
 
   double _positionAt(double t) =>
-      _origin +
-      (_target - _origin) * Curves.easeOutCubic.transform(t);
+      _origin + (_target - _origin) * Curves.easeOutCubic.transform(t);
 
   @override
   Widget build(BuildContext context) {
@@ -116,18 +115,22 @@ class _AppNavBarState extends State<AppNavBar>
       ),
       child: SizedBox(
         height: _barHeight,
-        // Taps need a Material to splash onto; without one the ink lands on
-        // the Scaffold, behind the bar, and is never seen.
-        child: Material(
-          type: MaterialType.transparency,
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final cellWidth = constraints.maxWidth / _items.length;
-              return AnimatedBuilder(
-                animation: _controller,
-                builder: (context, _) => _buildBar(cellWidth),
-              );
-            },
+        // The ink layer must share the bar's physical outline. Previously the
+        // white decoration was rounded but the Material remained rectangular,
+        // allowing press ripples to paint beyond the visible corners.
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(26),
+          child: Material(
+            color: Colors.white,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final cellWidth = constraints.maxWidth / _items.length;
+                return AnimatedBuilder(
+                  animation: _controller,
+                  builder: (context, _) => _buildBar(cellWidth),
+                );
+              },
+            ),
           ),
         ),
       ),
@@ -176,7 +179,7 @@ class _AppNavBarState extends State<AppNavBar>
   }
 }
 
-class _NavItem extends StatelessWidget {
+class _NavItem extends StatefulWidget {
   const _NavItem({
     required this.label,
     required this.iconPath,
@@ -194,45 +197,98 @@ class _NavItem extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
+  State<_NavItem> createState() => _NavItemState();
+}
+
+class _NavItemState extends State<_NavItem> {
+  bool _pressed = false;
+  bool _hovered = false;
+  bool _focused = false;
+
+  void _setPressed(bool value) {
+    if (_pressed == value) return;
+    setState(() => _pressed = value);
+  }
+
+  void _setHovered(bool value) {
+    if (_hovered == value) return;
+    setState(() => _hovered = value);
+  }
+
+  void _setFocused(bool value) {
+    if (_focused == value) return;
+    setState(() => _focused = value);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final ink = Color.lerp(AppColors.inkMuted, _activeInk, arrival)!;
+    final ink = Color.lerp(AppColors.inkMuted, _activeInk, widget.arrival)!;
+    final feedbackAlpha = _pressed
+        ? 0.11
+        : _focused
+        ? 0.08
+        : _hovered
+        ? 0.045
+        : 0.0;
 
     return Semantics(
-      selected: selected,
+      selected: widget.selected,
       button: true,
-      label: label,
+      label: widget.label,
       child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        splashFactory: InkRipple.splashFactory,
-        splashColor: AppColors.lavender.withValues(alpha: 0.12),
-        highlightColor: AppColors.lavender.withValues(alpha: 0.06),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        onTap: widget.onTap,
+        onHighlightChanged: _setPressed,
+        onHover: _setHovered,
+        onFocusChange: _setFocused,
+        splashFactory: NoSplash.splashFactory,
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        hoverColor: Colors.transparent,
+        focusColor: Colors.transparent,
+        child: Stack(
+          fit: StackFit.expand,
           children: [
-            SizedBox(
-              height: _pillHeight,
-              child: Center(
-                child: SvgPicture.asset(
-                  iconPath,
-                  width: 24,
-                  height: 24,
-                  colorFilter: ColorFilter.mode(ink, BlendMode.srcIn),
-                ),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 120),
+              curve: Curves.easeOutCubic,
+              margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+              decoration: BoxDecoration(
+                color: AppColors.lavender.withValues(alpha: feedbackAlpha),
+                borderRadius: BorderRadius.circular(20),
               ),
             ),
-            const SizedBox(height: _iconLabelGap),
-            Text(
-              label,
-              style: TextStyle(
-                color: ink,
-                fontFamily: 'Urbanist',
-                fontSize: _labelHeight,
-                height: 1,
-                // Urbanist ships one variable cut with a wght axis, so the
-                // label can thicken continuously rather than snap mid-slide.
-                fontWeight: FontWeight.w500,
-                fontVariations: [FontVariation('wght', 500 + 120 * arrival)],
+            AnimatedScale(
+              scale: _pressed ? 0.965 : 1,
+              duration: const Duration(milliseconds: 100),
+              curve: Curves.easeOutCubic,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    height: _pillHeight,
+                    child: Center(
+                      child: SvgPicture.asset(
+                        widget.iconPath,
+                        width: 24,
+                        height: 24,
+                        colorFilter: ColorFilter.mode(ink, BlendMode.srcIn),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: _iconLabelGap),
+                  Text(
+                    widget.label,
+                    style: TextStyle(
+                      color: ink,
+                      fontFamily: 'Urbanist',
+                      fontSize: _labelHeight,
+                      height: 1,
+                      // A fixed weight lets Flutter reuse the same shaped/
+                      // rasterized glyphs throughout the selection motion.
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

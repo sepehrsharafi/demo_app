@@ -100,11 +100,25 @@ class LearnTab extends StatelessWidget {
                           onTap: () =>
                               _showComingSoon(context, _featured.title),
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 28),
+                        Row(
+                          children: [
+                            Text(
+                              'More to explore',
+                              style: textTheme.titleMedium?.copyWith(
+                                fontSize: 15,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            const Expanded(
+                              child: Divider(color: AppColors.line, height: 1),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 14),
                         for (var i = 0; i < _articles.length; i++) ...[
                           _ArticleCard(
                             data: _articles[i],
-                            storyNumber: i + 2,
                             onTap: () =>
                                 _showComingSoon(context, _articles[i].title),
                           ),
@@ -135,142 +149,157 @@ class _FeaturedArticleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.navy,
-      borderRadius: BorderRadius.circular(30),
+      color: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(30),
+        side: const BorderSide(color: AppColors.line),
+      ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
-        child: SizedBox(
-          height: 420,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              Image.asset(
-                data.imagePath,
-                fit: BoxFit.cover,
-                alignment: const Alignment(0.3, -0.1),
-              ),
-              const DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color(0x1006132D),
-                      Color(0x0006132D),
-                      Color(0xE80A1A3D),
-                    ],
-                    stops: [0, 0.36, 1],
-                  ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              height: 245,
+              child: ClipPath(
+                clipper: const _FeatureImageClipper(),
+                child: Image.asset(
+                  data.imagePath,
+                  fit: BoxFit.cover,
+                  alignment: const Alignment(0.3, -0.12),
                 ),
               ),
-              const Positioned(left: 16, top: 16, child: _FeaturedBadge()),
-              Positioned(
-                right: 16,
-                top: 16,
-                child: _SourcePill(source: data.source),
-              ),
-              Positioned(
-                left: 22,
-                right: 22,
-                bottom: 22,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _CategoryTag(
-                      text: data.category,
-                      color: data.accent,
-                      onDark: true,
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      data.title,
-                      style: Theme.of(context).textTheme.headlineSmall
-                          ?.copyWith(
-                            color: Colors.white,
-                            fontSize: 27,
-                            height: 1.02,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: -0.85,
-                          ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      data.snippet,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.white.withValues(alpha: 0.78),
-                        fontSize: 13.5,
-                        height: 1.35,
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 5, 20, 19),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        'Editor’s selection',
+                        style: Theme.of(context).textTheme.labelMedium
+                            ?.copyWith(color: data.accent, fontSize: 12.5),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(999),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Text(
+                          '${data.source}  ·  ${data.readTime}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.end,
+                          style: const TextStyle(
+                            color: AppColors.inkMuted,
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w600,
                           ),
-                          child: const Padding(
-                            padding: EdgeInsets.fromLTRB(14, 9, 10, 9),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  'Read story',
-                                  style: TextStyle(
-                                    color: AppColors.navy,
-                                    fontSize: 12.5,
-                                    fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 11),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 3,
+                        height: 67,
+                        margin: const EdgeInsets.only(top: 2, right: 13),
+                        decoration: BoxDecoration(
+                          color: data.accent,
+                          borderRadius: BorderRadius.circular(99),
+                        ),
+                      ),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              data.title,
+                              style: Theme.of(context).textTheme.headlineSmall
+                                  ?.copyWith(
+                                    fontSize: 29,
+                                    height: 1,
+                                    letterSpacing: -0.95,
                                   ),
-                                ),
-                                SizedBox(width: 6),
-                                Icon(
-                                  Icons.arrow_outward_rounded,
-                                  color: AppColors.navy,
-                                  size: 15,
-                                ),
-                              ],
                             ),
-                          ),
+                            const SizedBox(height: 8),
+                            Text(
+                              data.snippet,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(fontSize: 13, height: 1.32),
+                            ),
+                          ],
                         ),
-                        const Spacer(),
-                        Text(
-                          data.readTime.toUpperCase(),
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.68),
-                            fontSize: 9.5,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 1.2,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 15),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        'Read the story',
+                        style: Theme.of(context).textTheme.labelMedium
+                            ?.copyWith(
+                              color: AppColors.navy,
+                              fontStyle: FontStyle.normal,
+                              fontSize: 12.5,
+                            ),
+                      ),
+                      const SizedBox(width: 7),
+                      const Icon(
+                        Icons.arrow_forward_rounded,
+                        color: AppColors.green,
+                        size: 17,
+                      ),
+                    ],
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
+class _FeatureImageClipper extends CustomClipper<Path> {
+  const _FeatureImageClipper();
+
+  @override
+  Path getClip(Size size) {
+    return Path()
+      ..moveTo(0, 0)
+      ..lineTo(0, size.height - 18)
+      ..cubicTo(
+        size.width * 0.28,
+        size.height - 50,
+        size.width * 0.7,
+        size.height + 8,
+        size.width,
+        size.height - 28,
+      )
+      ..lineTo(size.width, 0)
+      ..close();
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
+
 /// A smaller, horizontal card used for every article below the featured one.
 /// The photograph is anchored to the card edge, with only a slight editorial
 /// angle where it meets the article copy.
 class _ArticleCard extends StatelessWidget {
-  const _ArticleCard({
-    required this.data,
-    required this.storyNumber,
-    required this.onTap,
-  });
+  const _ArticleCard({required this.data, required this.onTap});
 
   final _Article data;
-  final int storyNumber;
   final VoidCallback onTap;
 
   @override
@@ -321,11 +350,6 @@ class _ArticleCard extends StatelessWidget {
                                   stops: [0.64, 1],
                                 ),
                               ),
-                            ),
-                            Positioned(
-                              left: 10,
-                              bottom: 10,
-                              child: _StoryNumber(number: storyNumber),
                             ),
                           ],
                         ),
@@ -401,34 +425,24 @@ class _ArticleCard extends StatelessWidget {
 }
 
 class _CategoryTag extends StatelessWidget {
-  const _CategoryTag({
-    required this.text,
-    required this.color,
-    this.onDark = false,
-  });
+  const _CategoryTag({required this.text, required this.color});
 
   final String text;
   final Color color;
-  final bool onDark;
 
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: onDark
-            ? Colors.white.withValues(alpha: 0.17)
-            : color.withValues(alpha: 0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(999),
-        border: onDark
-            ? Border.all(color: Colors.white.withValues(alpha: 0.16))
-            : null,
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         child: Text(
           text,
           style: TextStyle(
-            color: onDark ? Colors.white : color,
+            color: color,
             fontSize: 9.5,
             fontWeight: FontWeight.w800,
             letterSpacing: 1.25,
@@ -502,73 +516,6 @@ class _SourceLine extends StatelessWidget {
   }
 }
 
-class _SourcePill extends StatelessWidget {
-  const _SourcePill({required this.source});
-
-  final String source;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: const Color(0xC70A1A3D),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.public_rounded,
-              color: Colors.white.withValues(alpha: 0.82),
-              size: 12,
-            ),
-            const SizedBox(width: 5),
-            Text(
-              'From $source',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 9.5,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _StoryNumber extends StatelessWidget {
-  const _StoryNumber({required this.number});
-
-  final int number;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.9),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-        child: Text(
-          number.toString().padLeft(2, '0'),
-          style: const TextStyle(
-            color: AppColors.navy,
-            fontSize: 9.5,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 0.8,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class _AngledImageClipper extends CustomClipper<Path> {
   const _AngledImageClipper();
 
@@ -585,51 +532,140 @@ class _AngledImageClipper extends CustomClipper<Path> {
   bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }
 
-class _FeaturedBadge extends StatelessWidget {
-  const _FeaturedBadge();
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.92),
-        borderRadius: BorderRadius.circular(999),
-        boxShadow: const [BoxShadow(color: Color(0x180A1733), blurRadius: 12)],
-      ),
-      child: const Padding(
-        padding: EdgeInsets.symmetric(horizontal: 11, vertical: 7),
-        child: Text(
-          "EDITOR'S PICK",
-          style: TextStyle(
-            color: AppColors.navy,
-            fontSize: 9.5,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 1.2,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class _LearnBackground extends StatelessWidget {
   const _LearnBackground();
 
   @override
   Widget build(BuildContext context) {
     return const IgnorePointer(
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFFF4FBF7), AppColors.background],
-            stops: [0.0, 0.4],
-          ),
-        ),
+      child: ColoredBox(
+        color: AppColors.background,
+        child: CustomPaint(painter: _LearnBackgroundPainter()),
       ),
     );
   }
+}
+
+class _LearnBackgroundPainter extends CustomPainter {
+  const _LearnBackgroundPainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    // Overlapping translucent fields bring the multi-color atmosphere from
+    // the other tabs into Learn while leaving the title area calm and clear.
+    final blushBounds = Rect.fromLTWH(-90, -48, 265, 220);
+    canvas.drawOval(
+      blushBounds,
+      Paint()
+        ..shader = const RadialGradient(
+          center: Alignment(-0.15, -0.2),
+          colors: [Color(0x99FFE1DD), Color(0x00FFE1DD)],
+        ).createShader(blushBounds),
+    );
+
+    final lavenderWash = Path()
+      ..moveTo(size.width * 0.3, 0)
+      ..cubicTo(
+        size.width * 0.38,
+        54,
+        size.width * 0.43,
+        137,
+        size.width * 0.67,
+        165,
+      )
+      ..cubicTo(size.width * 0.84, 184, size.width + 18, 132, size.width, 0)
+      ..close();
+    canvas.drawPath(lavenderWash, Paint()..color = const Color(0x66EEE8FF));
+
+    final skyBounds = Rect.fromLTWH(size.width * 0.42, -42, 210, 175);
+    canvas.drawOval(
+      skyBounds,
+      Paint()
+        ..shader = const RadialGradient(
+          colors: [Color(0x88DCEAFF), Color(0x00DCEAFF)],
+        ).createShader(skyBounds),
+    );
+
+    final topCenter = Offset(size.width + 5, 82);
+    canvas.drawCircle(topCenter, 112, Paint()..color = const Color(0x88DDF4EC));
+    canvas.drawCircle(
+      Offset(size.width - 5, 72),
+      71,
+      Paint()
+        ..color = const Color(0x336C8E7D)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.1,
+    );
+
+    final blushContour = Path()
+      ..moveTo(0, 116)
+      ..cubicTo(38, 100, 82, 108, 112, 143);
+    canvas.drawPath(
+      blushContour,
+      Paint()
+        ..color = const Color(0x40E96862)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.1,
+    );
+
+    // A broad paper-like fold enters from the left and sits behind the list.
+    final leftFold = Path()
+      ..moveTo(0, size.height * 0.42)
+      ..cubicTo(
+        48,
+        size.height * 0.39,
+        78,
+        size.height * 0.46,
+        61,
+        size.height * 0.54,
+      )
+      ..cubicTo(
+        45,
+        size.height * 0.61,
+        17,
+        size.height * 0.64,
+        0,
+        size.height * 0.65,
+      )
+      ..close();
+    canvas.drawPath(leftFold, Paint()..color = const Color(0x55E7F0FF));
+
+    // One fine contour gives the flat color fields a little dimensionality.
+    final contour = Path()
+      ..moveTo(0, size.height * 0.48)
+      ..cubicTo(
+        30,
+        size.height * 0.46,
+        58,
+        size.height * 0.49,
+        49,
+        size.height * 0.56,
+      );
+    canvas.drawPath(
+      contour,
+      Paint()
+        ..color = const Color(0x305E83A1)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1,
+    );
+
+    final bottomShape = Path()
+      ..moveTo(size.width, size.height * 0.73)
+      ..cubicTo(
+        size.width - 50,
+        size.height * 0.75,
+        size.width - 78,
+        size.height * 0.84,
+        size.width - 45,
+        size.height,
+      )
+      ..lineTo(size.width, size.height)
+      ..close();
+    canvas.drawPath(bottomShape, Paint()..color = const Color(0x4DF1ECFA));
+  }
+
+  @override
+  bool shouldRepaint(covariant _LearnBackgroundPainter oldDelegate) => false;
 }
 
 class _Article {

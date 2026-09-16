@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../core/models/child_profile.dart';
 import '../../core/theme/app_theme.dart';
@@ -279,58 +278,80 @@ class _HistoryHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(18, 22, 18, 8),
-      // A Row keeps the two sides genuinely aligned to each other (vertically
-      // centered as a pair) instead of each being eyeballed into a corner,
-      // which is also what was letting the leaf and the quote collide.
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Chats', style: textTheme.displayLarge),
-                const SizedBox(height: 4),
-                Text(
-                  'Continue where you left off.',
-                  style: textTheme.bodyLarge,
+      padding: const EdgeInsets.fromLTRB(18, 18, 0, 16),
+      child: Semantics(
+        container: true,
+        label: 'Chats. Continue where you left off. Small questions, brighter tomorrows.',
+        child: SizedBox(
+          height: 148,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Positioned(
+                top: 0,
+                right: 0,
+                bottom: 0,
+                width: 300,
+                child: Image.asset(
+                  'assets/images/chat_header_botanical_transparent.png',
+                  fit: BoxFit.cover,
+                  alignment: Alignment.centerRight,
+                  filterQuality: FilterQuality.high,
+                  excludeFromSemantics: true,
                 ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 12),
-          IgnorePointer(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Opacity(
-                  opacity: 0.75,
-                  child: Text(
-                    'Small\nquestions.\nBrighter\ntomorrows.',
-                    textAlign: TextAlign.right,
-                    style: TextStyle(
-                      color: AppColors.whisper,
-                      fontSize: 12,
-                      height: 1.15,
-                      fontStyle: FontStyle.italic,
-                      fontWeight: FontWeight.w500,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ExcludeSemantics(
+                      child: Text('Chats', style: textTheme.displayLarge),
                     ),
-                  ),
+                    const SizedBox(height: 4),
+                    ExcludeSemantics(
+                      child: Text(
+                        'Continue where you left off.',
+                        style: textTheme.bodyLarge,
+                      ),
+                    ),
+                    const Spacer(),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 300),
+                      child: const ExcludeSemantics(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.auto_awesome_rounded,
+                              size: 14,
+                              color: AppColors.lavender,
+                            ),
+                            SizedBox(width: 7),
+                            Flexible(
+                              child: Text(
+                                'Small questions. Brighter tomorrows.',
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: AppColors.whisper,
+                                  fontSize: 12.5,
+                                  height: 1.1,
+                                  fontStyle: FontStyle.italic,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 8),
-                Opacity(
-                  opacity: 0.55,
-                  child: SvgPicture.asset(
-                    'assets/icons/hero_leaf.svg',
-                    width: 44,
-                    height: 54,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
