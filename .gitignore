@@ -46,3 +46,7 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# The Groq API key, passed to builds with --dart-define-from-file.
+# secrets.example.json shows its shape.
+secrets.json

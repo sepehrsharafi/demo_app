@@ -1,0 +1,866 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-29T09:49:39.711Z",
+  "title": "Design System: Mother AI",
+  "extensions": {
+    "colorMeta": {
+      "ground": {
+        "role": "neutral",
+        "displayName": "Milk Ground",
+        "canonical": "#FFFCF9",
+        "tonalRamp": [
+          "#492604",
+          "#7E4207",
+          "#B35E09",
+          "#E97A0C",
+          "#F59638",
+          "#F7B36E",
+          "#FAD1A8",
+          "#FEF2E7"
+        ]
+      },
+      "white": {
+        "role": "neutral",
+        "displayName": "Paper White",
+        "canonical": "#FFFFFF",
+        "tonalRamp": [
+          "#262626",
+          "#424242",
+          "#5E5E5E",
+          "#7A7A7A",
+          "#969696",
+          "#B3B3B3",
+          "#D1D1D1",
+          "#F2F2F2"
+        ]
+      },
+      "panel": {
+        "role": "neutral",
+        "displayName": "Lilac Panel",
+        "canonical": "#F5F0F7",
+        "tonalRamp": [
+          "#2B1B32",
+          "#4B2E56",
+          "#6B427B",
+          "#8A55A0",
+          "#A477B6",
+          "#BC9BCA",
+          "#D7C3DF",
+          "#F4EEF6"
+        ]
+      },
+      "accent-fill": {
+        "role": "neutral",
+        "displayName": "Hover Fill",
+        "canonical": "#EEE7F2",
+        "tonalRamp": [
+          "#291B32",
+          "#482F56",
+          "#66427A",
+          "#84569F",
+          "#9F77B6",
+          "#B99CC9",
+          "#D5C3DF",
+          "#F3EEF6"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Warm Hairline",
+        "canonical": "#EAE3EC",
+        "tonalRamp": [
+          "#2A1F2E",
+          "#49364F",
+          "#684C70",
+          "#876392",
+          "#A282AA",
+          "#BBA4C1",
+          "#D6C8DA",
+          "#F4F0F5"
+        ]
+      },
+      "ink": {
+        "role": "primary",
+        "displayName": "Plum Ink",
+        "canonical": "#1F1B3D",
+        "tonalRamp": [
+          "#1B1735",
+          "#2F295C",
+          "#423A83",
+          "#564BAA",
+          "#786EBF",
+          "#9C95D0",
+          "#C4BFE3",
+          "#EEEDF7"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Heather Muted",
+        "canonical": "#6B6781",
+        "tonalRamp": [
+          "#23222B",
+          "#3D3B4A",
+          "#575469",
+          "#716D88",
+          "#8E8BA2",
+          "#ADAABB",
+          "#CECCD6",
+          "#F1F1F4"
+        ]
+      },
+      "voice": {
+        "role": "secondary",
+        "displayName": "Lavender Voice",
+        "canonical": "#7B57DB",
+        "tonalRamp": [
+          "#1B0E3F",
+          "#2F176D",
+          "#43219B",
+          "#562BCA",
+          "#7853DA",
+          "#9C81E4",
+          "#C4B3EF",
+          "#EEEAFB"
+        ]
+      },
+      "voice-tint": {
+        "role": "secondary",
+        "displayName": "Voice Mist",
+        "canonical": "#F1EBFD",
+        "tonalRamp": [
+          "#1C0746",
+          "#300C79",
+          "#4511AC",
+          "#5916DF",
+          "#7A41EC",
+          "#9E74F1",
+          "#C5ACF7",
+          "#EFE8FD"
+        ]
+      },
+      "voice-deep": {
+        "role": "secondary",
+        "displayName": "Deep Voice",
+        "canonical": "#6A45CC",
+        "tonalRamp": [
+          "#1C103C",
+          "#311D68",
+          "#462994",
+          "#5B35C0",
+          "#7C5BD2",
+          "#9F87DE",
+          "#C5B7EB",
+          "#EFEBFA"
+        ]
+      },
+      "mist": {
+        "role": "neutral",
+        "displayName": "Morning Mist",
+        "canonical": "#F3EDFB",
+        "tonalRamp": [
+          "#230E3F",
+          "#3C186C",
+          "#56229A",
+          "#6F2DC8",
+          "#8D54D9",
+          "#AC82E3",
+          "#CDB4EE",
+          "#F1EAFA"
+        ]
+      },
+      "leaf": {
+        "role": "neutral",
+        "displayName": "Leaf Lilac",
+        "canonical": "#E9E0F9",
+        "tonalRamp": [
+          "#1F0C40",
+          "#36166F",
+          "#4D1F9E",
+          "#6328CD",
+          "#8350DD",
+          "#A47FE6",
+          "#C8B2F0",
+          "#F0EAFB"
+        ]
+      },
+      "destructive": {
+        "role": "neutral",
+        "displayName": "Alarm Red",
+        "canonical": "#D92D40",
+        "tonalRamp": [
+          "#410C12",
+          "#70141E",
+          "#A01D2B",
+          "#CF2638",
+          "#DF4E5E",
+          "#E87D89",
+          "#F1B1B8",
+          "#FBE9EB"
+        ]
+      },
+      "care-home": {
+        "role": "tertiary",
+        "displayName": "Jade",
+        "canonical": "#00A86B",
+        "tonalRamp": [
+          "#044930",
+          "#077E53",
+          "#09B376",
+          "#0CE999",
+          "#38F5B0",
+          "#6EF7C5",
+          "#A8FADC",
+          "#E7FEF5"
+        ]
+      },
+      "care-home-tint": {
+        "role": "tertiary",
+        "displayName": "Jade Tint",
+        "canonical": "#E2F5EC",
+        "tonalRamp": [
+          "#143927",
+          "#226344",
+          "#308C61",
+          "#3FB67E",
+          "#64C999",
+          "#8DD8B4",
+          "#BBE7D2",
+          "#ECF8F3"
+        ]
+      },
+      "care-home-deep": {
+        "role": "tertiary",
+        "displayName": "Jade Deep",
+        "canonical": "#006B45",
+        "tonalRamp": [
+          "#044930",
+          "#077E54",
+          "#09B377",
+          "#0CE99A",
+          "#38F5B2",
+          "#6EF7C6",
+          "#A8FADD",
+          "#E7FEF6"
+        ]
+      },
+      "care-gp": {
+        "role": "tertiary",
+        "displayName": "Signal Amber",
+        "canonical": "#FFA412",
+        "tonalRamp": [
+          "#492E04",
+          "#7E5007",
+          "#B37209",
+          "#E9940C",
+          "#F5AC38",
+          "#F7C26E",
+          "#FADBA8",
+          "#FEF5E7"
+        ]
+      },
+      "care-gp-tint": {
+        "role": "tertiary",
+        "displayName": "Amber Tint",
+        "canonical": "#FFF0D9",
+        "tonalRamp": [
+          "#492D04",
+          "#7E4F07",
+          "#B37009",
+          "#E9920C",
+          "#F5AA38",
+          "#F7C16E",
+          "#FADAA8",
+          "#FEF5E7"
+        ]
+      },
+      "care-gp-deep": {
+        "role": "tertiary",
+        "displayName": "Amber Deep",
+        "canonical": "#8A5200",
+        "tonalRamp": [
+          "#492D04",
+          "#7E4E07",
+          "#B36E09",
+          "#E98F0C",
+          "#F5A838",
+          "#F7BF6E",
+          "#FAD9A8",
+          "#FEF4E7"
+        ]
+      },
+      "care-urgent": {
+        "role": "tertiary",
+        "displayName": "Signal Red",
+        "canonical": "#F2384A",
+        "tonalRamp": [
+          "#48050B",
+          "#7C0813",
+          "#B10C1C",
+          "#E60F24",
+          "#F23B4C",
+          "#F66F7C",
+          "#F9A9B1",
+          "#FDE7E9"
+        ]
+      },
+      "care-urgent-tint": {
+        "role": "tertiary",
+        "displayName": "Red Tint",
+        "canonical": "#FFE4E7",
+        "tonalRamp": [
+          "#49040B",
+          "#7E0714",
+          "#B3091C",
+          "#E90C25",
+          "#F5384D",
+          "#F76E7D",
+          "#FAA8B1",
+          "#FEE7E9"
+        ]
+      },
+      "care-urgent-deep": {
+        "role": "tertiary",
+        "displayName": "Red Deep",
+        "canonical": "#B0142A",
+        "tonalRamp": [
+          "#450810",
+          "#770E1C",
+          "#A91328",
+          "#DC1934",
+          "#EA435B",
+          "#EF7687",
+          "#F6ADB7",
+          "#FCE8EB"
+        ]
+      },
+      "topic-health-tint": {
+        "role": "tertiary",
+        "displayName": "Health Rose Tint",
+        "canonical": "#FCE8EF",
+        "tonalRamp": [
+          "#44091D",
+          "#750F33",
+          "#A71649",
+          "#D91C5E",
+          "#E7467E",
+          "#ED78A1",
+          "#F4AEC7",
+          "#FCE8EF"
+        ]
+      },
+      "topic-health-tone": {
+        "role": "tertiary",
+        "displayName": "Health Rose",
+        "canonical": "#B8436A",
+        "tonalRamp": [
+          "#381420",
+          "#612338",
+          "#8A3250",
+          "#B34167",
+          "#C76686",
+          "#D68FA7",
+          "#E6BCCA",
+          "#F8ECF0"
+        ]
+      },
+      "topic-feeding-tint": {
+        "role": "tertiary",
+        "displayName": "Feeding Peach Tint",
+        "canonical": "#FDEDE3",
+        "tonalRamp": [
+          "#471F05",
+          "#7C3509",
+          "#B04B0D",
+          "#E46210",
+          "#F1823C",
+          "#F5A370",
+          "#F9C8A9",
+          "#FDF0E7"
+        ]
+      },
+      "topic-feeding-tone": {
+        "role": "tertiary",
+        "displayName": "Feeding Peach",
+        "canonical": "#B45A2E",
+        "tonalRamp": [
+          "#3D1E10",
+          "#6A351B",
+          "#964B26",
+          "#C36132",
+          "#D48158",
+          "#E0A385",
+          "#ECC8B6",
+          "#FAF0EB"
+        ]
+      },
+      "topic-sleep-tint": {
+        "role": "tertiary",
+        "displayName": "Sleep Sky Tint",
+        "canonical": "#E7EEFB",
+        "tonalRamp": [
+          "#0B1E42",
+          "#133472",
+          "#1B4AA2",
+          "#2360D2",
+          "#4C80E1",
+          "#7CA2E9",
+          "#B0C7F2",
+          "#E9F0FB"
+        ]
+      },
+      "topic-sleep-tone": {
+        "role": "tertiary",
+        "displayName": "Sleep Sky",
+        "canonical": "#3F66B8",
+        "tonalRamp": [
+          "#142039",
+          "#223763",
+          "#304E8D",
+          "#3E65B6",
+          "#6384CA",
+          "#8DA5D8",
+          "#BBC9E8",
+          "#ECF0F8"
+        ]
+      },
+      "topic-growth-tint": {
+        "role": "tertiary",
+        "displayName": "Growth Lavender Tint",
+        "canonical": "#EFE9FC",
+        "tonalRamp": [
+          "#1C0943",
+          "#301075",
+          "#4417A6",
+          "#581DD7",
+          "#7947E6",
+          "#9D78ED",
+          "#C4AEF4",
+          "#EFE9FC"
+        ]
+      },
+      "topic-growth-tone": {
+        "role": "tertiary",
+        "displayName": "Growth Lavender",
+        "canonical": "#7050C8",
+        "tonalRamp": [
+          "#1D123A",
+          "#322065",
+          "#472D90",
+          "#5D3BBA",
+          "#7D60CD",
+          "#A08BDA",
+          "#C6B9E9",
+          "#EFECF9"
+        ]
+      },
+      "topic-behaviour-tint": {
+        "role": "tertiary",
+        "displayName": "Behaviour Orchid Tint",
+        "canonical": "#F6E8F8",
+        "tonalRamp": [
+          "#36123B",
+          "#5D1F66",
+          "#842C91",
+          "#AB39BC",
+          "#C05FCE",
+          "#D18ADB",
+          "#E3B9EA",
+          "#F7EBF9"
+        ]
+      },
+      "topic-behaviour-tone": {
+        "role": "tertiary",
+        "displayName": "Behaviour Orchid",
+        "canonical": "#9444A8",
+        "tonalRamp": [
+          "#301636",
+          "#53265E",
+          "#763686",
+          "#9A47AE",
+          "#B16AC3",
+          "#C692D3",
+          "#DDBEE5",
+          "#F5EDF8"
+        ]
+      },
+      "child-emma": {
+        "role": "tertiary",
+        "displayName": "Emma Rose (demo child hue)",
+        "canonical": "#C23F84",
+        "tonalRamp": [
+          "#3A1227",
+          "#652044",
+          "#8F2D61",
+          "#BA3B7E",
+          "#CD6099",
+          "#DA8BB5",
+          "#E9B9D2",
+          "#F9ECF3"
+        ]
+      },
+      "child-emma-tint": {
+        "role": "tertiary",
+        "displayName": "Emma Tint",
+        "canonical": "#FBEAF3",
+        "tonalRamp": [
+          "#400C28",
+          "#6F1545",
+          "#9F1E62",
+          "#CE277F",
+          "#DE4F9B",
+          "#E77EB6",
+          "#F0B2D3",
+          "#FBEAF3"
+        ]
+      },
+      "child-daniel": {
+        "role": "tertiary",
+        "displayName": "Daniel Cobalt (demo child hue)",
+        "canonical": "#3462D6",
+        "tonalRamp": [
+          "#0D1B40",
+          "#162F6E",
+          "#20439D",
+          "#2957CC",
+          "#5178DC",
+          "#809DE5",
+          "#B3C4F0",
+          "#EAEFFB"
+        ]
+      },
+      "child-daniel-tint": {
+        "role": "tertiary",
+        "displayName": "Daniel Tint",
+        "canonical": "#E8EEFD",
+        "tonalRamp": [
+          "#061846",
+          "#0B2A7A",
+          "#0F3CAE",
+          "#144EE1",
+          "#3F71EE",
+          "#7297F3",
+          "#ABC1F8",
+          "#E8EEFD"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The one headline a screen opens with; Home's question at 38px."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Pushed-screen and sheet titles, article section heads, the stage panel title."
+      },
+      "section": {
+        "displayName": "Section",
+        "purpose": "A section heading inside a screen, with an optional See all link."
+      },
+      "row-title": {
+        "displayName": "Row Title",
+        "purpose": "A row's primary line; 14 to 17px variants on tiles, pills and rows."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Answers, bubbles, composer text, stage facts."
+      },
+      "secondary": {
+        "displayName": "Secondary",
+        "purpose": "Previews, descriptions, the Home subline; muted."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Group headings; sentence case, muted."
+      },
+      "figure": {
+        "displayName": "Figure",
+        "purpose": "Times, ages, read lengths; tabular figures."
+      }
+    },
+    "shadows": [
+      {
+        "name": "composer-lift",
+        "value": "0 8px 24px rgba(91,63,176,0.08), 0 1px 3px rgba(31,27,61,0.04)",
+        "purpose": "Home's raised composer only: the one resting shadow in the app."
+      },
+      {
+        "name": "push-edge",
+        "value": "-6px 0 24px rgba(31,27,61,0.10)",
+        "purpose": "Only on the incoming route during the weighted-sheet push (Android, web, desktop). Never at rest."
+      },
+      {
+        "name": "sheet-scrim",
+        "value": "rgba(31,27,61,0.32)",
+        "purpose": "Barrier colour behind modal sheets."
+      }
+    ],
+    "motion": [
+      {
+        "name": "settle",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "The app's one curve: quick off the mark, long settle, no overshoot."
+      },
+      {
+        "name": "sheet-in",
+        "value": "520ms settle",
+        "purpose": "Sheets rise; the page behind scales to 94%, drops 10px and rounds to 28px on plum ink."
+      },
+      {
+        "name": "sheet-out",
+        "value": "260ms easeInCubic",
+        "purpose": "Sheets drop away; the page comes forward."
+      },
+      {
+        "name": "sheet-cascade",
+        "value": "fade 240ms + rise 460ms settle, delay 110ms + 45ms per row",
+        "purpose": "Rows inside a sheet arrive in order."
+      },
+      {
+        "name": "morning-leaves",
+        "value": "arrive 3.5s, focus 2.5s, keystroke 1.4s, child change 3s with 0.7s re-tint",
+        "purpose": "Home's leaves move on events, lean toward the composer while focused, then settle and stop the ticker."
+      },
+      {
+        "name": "child-switch",
+        "value": "pill 320ms settle, headline 420ms settle",
+        "purpose": "Child pill cross-fades and resizes; the headline slides the new name up."
+      },
+      {
+        "name": "topic-select",
+        "value": "220ms settle",
+        "purpose": "Topic tile fill, edge and square change."
+      },
+      {
+        "name": "care-strip-wipe",
+        "value": "520ms settle",
+        "purpose": "Care strip clips in from the leading edge when an answer lands."
+      },
+      {
+        "name": "question-rise",
+        "value": "fade 200ms + rise 380ms settle, scale 0.96 to 1 from the tail corner",
+        "purpose": "A sent question arrives."
+      },
+      {
+        "name": "tab-pill",
+        "value": "560ms, lead Interval(0, 0.72, settle), trail Interval(0.18, 1, settle)",
+        "purpose": "Active-tab pill stretches across and gathers into the new tab; interrupted taps relaunch."
+      },
+      {
+        "name": "tab-switch",
+        "value": "340ms settle, translation only",
+        "purpose": "Tab bodies slide toward their side."
+      },
+      {
+        "name": "send-wake",
+        "value": "220ms settle, scale 0.86 to 1",
+        "purpose": "Send button wakes when there is something to send."
+      },
+      {
+        "name": "toast",
+        "value": "in 560ms settle (fade 180ms), mark +140ms; out 220ms easeInCubic; 5s countdown",
+        "purpose": "Demo notice toast."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "MediaQuery.disableAnimations",
+        "purpose": "Every animation above has an opt-out; leaves hold still, the push falls back to a fade."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "tab-content-max",
+        "value": "560px"
+      },
+      {
+        "name": "reading-content-max",
+        "value": "640px"
+      },
+      {
+        "name": "tab-bar-max",
+        "value": "520px"
+      },
+      {
+        "name": "question-bubble-max",
+        "value": "420px"
+      },
+      {
+        "name": "article-photo-max-height",
+        "value": "440px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Plum-ink button for the one primary action on a screen.",
+      "html": "<button class=\"ds-btn-primary\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z\"/><path d=\"M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1\"/></svg>Ask Mother AI about this</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 18px; background: #1F1B3D; color: #FFFFFF; border: none; border-radius: 14px; font-family: Geist, system-ui, sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.2s cubic-bezier(0.16,1,0.3,1); } .ds-btn-primary:hover { background: rgba(31,27,61,0.9); } .ds-btn-primary:active { background: rgba(31,27,61,0.8); } .ds-btn-primary:focus-visible { outline: 2px solid #7B57DB; outline-offset: 2px; }"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Lower-weight choice: Edit, See plans, attach sources.",
+      "html": "<button class=\"ds-btn-outline\">See plans</button>",
+      "css": ".ds-btn-outline { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 18px; background: #FFFCF9; color: #1F1B3D; border: 1px solid #EAE3EC; border-radius: 14px; font-family: Geist, system-ui, sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.2s; } .ds-btn-outline:hover { background: #EEE7F2; } .ds-btn-outline:focus-visible { outline: 2px solid #7B57DB; outline-offset: 2px; }"
+    },
+    {
+      "name": "Raised Ask Composer",
+      "kind": "input",
+      "refersTo": "ask-composer-raised",
+      "description": "Home's composer: white on the mist, violet sparkle, the app's one resting shadow; send wakes in violet once there is text.",
+      "html": "<div class=\"ds-morning\"><label class=\"ds-composer\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"ds-spark\"><path d=\"M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z\"/><path d=\"M20 3v4\"/><path d=\"M22 5h-4\"/></svg><input placeholder=\"Ask anything about Emma\" /><button class=\"ds-send\" aria-label=\"Send\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m5 12 7-7 7 7\"/><path d=\"M12 19V5\"/></svg></button></label></div>",
+      "css": ".ds-morning { padding: 24px; background: #F3EDFB; } .ds-composer { display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 6px 6px 6px 16px; background: #FFFFFF; border: 1px solid #EAE3EC; border-radius: 26px; box-shadow: 0 8px 24px rgba(91,63,176,0.08), 0 1px 3px rgba(31,27,61,0.04); } .ds-composer:focus-within { outline: 2px solid #7B57DB; outline-offset: 2px; } .ds-spark { color: #7B57DB; flex: none; } .ds-composer input { flex: 1; border: none; background: transparent; outline: none; font-family: Geist, system-ui, sans-serif; font-size: 16px; line-height: 1.5; letter-spacing: -0.1px; color: #1F1B3D; caret-color: #7B57DB; } .ds-composer input::placeholder { color: #6B6781; } .ds-send { display: grid; place-items: center; width: 44px; height: 44px; border: none; border-radius: 22px; background: #F1EBFD; color: #7B57DB; transform: scale(0.86); transition: transform 220ms cubic-bezier(0.16,1,0.3,1), background 0.2s; } .ds-composer input:not(:placeholder-shown) + .ds-send { background: #7B57DB; color: #fff; transform: scale(1); cursor: pointer; } .ds-composer input:not(:placeholder-shown) + .ds-send:hover { background: #6A45CC; } @media (prefers-reduced-motion: reduce) { .ds-send { transition: none; } }"
+    },
+    {
+      "name": "Topic Tiles",
+      "kind": "chip",
+      "refersTo": "topic-tile",
+      "description": "Start from a topic: hairline tiles with a hue icon square; chosen takes Mother AI violet.",
+      "html": "<div class=\"ds-topics\"><button class=\"ds-topic\"><span class=\"ds-sq\" style=\"background:#FCE8EF;color:#B8436A\"><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M11 2v2\"/><path d=\"M5 2v2\"/><path d=\"M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1\"/><path d=\"M8 15a6 6 0 0 0 12 0v-3\"/><circle cx=\"20\" cy=\"10\" r=\"2\"/></svg></span>Health</button><button class=\"ds-topic ds-on\" aria-pressed=\"true\"><span class=\"ds-sq\"><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z\"/></svg></span>Sleep</button><button class=\"ds-topic\"><span class=\"ds-sq\" style=\"background:#EFE9FC;color:#7050C8\"><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M7 20h10\"/><path d=\"M10 20c5.5-2.5.8-6.4 3-10\"/><path d=\"M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z\"/><path d=\"M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z\"/></svg></span>Growth</button></div>",
+      "css": ".ds-topics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 360px; } .ds-topic { display: flex; align-items: center; gap: 8px; padding: 5px 8px 5px 5px; background: #FFFCF9; border: 1px solid #EAE3EC; border-radius: 16px; font-family: Geist, system-ui, sans-serif; font-size: 14px; font-weight: 600; letter-spacing: -0.2px; color: #1F1B3D; cursor: pointer; transition: background 220ms cubic-bezier(0.16,1,0.3,1), border-color 220ms cubic-bezier(0.16,1,0.3,1); } .ds-topic:hover { background: #F5F0F7; } .ds-topic:focus-visible { outline: 2px solid #7B57DB; outline-offset: 2px; } .ds-sq { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; flex: none; transition: background 220ms cubic-bezier(0.16,1,0.3,1); } .ds-on { background: #F1EBFD; border-color: #7B57DB; color: #6A45CC; } .ds-on .ds-sq { background: #7B57DB; color: #FFFFFF; }"
+    },
+    {
+      "name": "Child Pill",
+      "kind": "custom",
+      "refersTo": "child-pill",
+      "description": "Who the question is about, and the control that changes it.",
+      "html": "<div class=\"ds-morning-pill\"><button class=\"ds-child\"><span class=\"ds-mono\">E</span><b>Emma</b><span class=\"ds-age\">&nbsp;&middot;&nbsp;6 months</span><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"ds-chev\"><path d=\"m6 9 6 6 6-6\"/></svg></button></div>",
+      "css": ".ds-morning-pill { padding: 20px; background: #F3EDFB; } .ds-child { display: inline-flex; align-items: center; padding: 5px 14px 5px 5px; background: #FFFFFF; border: 1px solid #EAE3EC; border-radius: 999px; font-family: Geist, system-ui, sans-serif; cursor: pointer; } .ds-child:hover { background: #F5F0F7; } .ds-child:focus-visible { outline: 2px solid #7B57DB; outline-offset: 2px; } .ds-mono { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: #FBEAF3; color: #C23F84; font-family: Urbanist, sans-serif; font-weight: 800; font-size: 16px; margin-right: 10px; } .ds-child b { font-size: 15px; font-weight: 600; letter-spacing: -0.2px; color: #1F1B3D; } .ds-age { font-size: 14px; font-weight: 500; color: #6B6781; font-variant-numeric: tabular-nums; } .ds-chev { color: #6B6781; margin-left: 6px; }"
+    },
+    {
+      "name": "Care Strip (urgent)",
+      "kind": "custom",
+      "refersTo": "care-strip-urgent",
+      "description": "Top of an answer: the care level said once, with the next step as a button.",
+      "html": "<div class=\"ds-care-strip\"><div class=\"ds-care-head\"><span class=\"ds-care-disc\"><svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"ds-care-icon\"><path d=\"M7 18v-6a5 5 0 1 1 10 0v6\"/><path d=\"M5 21a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-1a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2z\"/><path d=\"M21 12h1\"/><path d=\"M18.5 4.5 18 5\"/><path d=\"M2 12h1\"/><path d=\"M12 2v1\"/><path d=\"m4.93 4.93.71.71\"/></svg></span><span class=\"ds-care-label\">Get urgent help now</span></div><button class=\"ds-care-action\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z\"/></svg>Call emergency services</button></div>",
+      "css": ".ds-care-strip { display: flex; flex-direction: column; gap: 8px; max-width: 340px; padding: 8px 14px 10px 10px; background: #FFE4E7; border-radius: 12px; animation: ds-wipe 520ms cubic-bezier(0.16,1,0.3,1) both; } .ds-care-head { display: flex; align-items: center; gap: 10px; } .ds-care-disc { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: #F2384A; } .ds-care-icon { color: #FFFFFF; } .ds-care-label { font-family: Geist, system-ui, sans-serif; font-size: 15px; font-weight: 600; letter-spacing: -0.2px; color: #B0142A; } .ds-care-action { display: flex; align-items: center; justify-content: center; gap: 8px; height: 44px; background: #B0142A; color: #fff; border: none; border-radius: 14px; font-family: Geist, system-ui, sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; } .ds-care-action:hover { background: rgba(176,20,42,0.9); } .ds-care-action:active { background: rgba(176,20,42,0.8); } .ds-care-action:focus-visible { outline: 2px solid #7B57DB; outline-offset: 2px; } @keyframes ds-wipe { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } } @media (prefers-reduced-motion: reduce) { .ds-care-strip { animation: none; } }"
+    },
+    {
+      "name": "Care Pill",
+      "kind": "chip",
+      "refersTo": "care-pill-home",
+      "description": "A care level where there is room for one word.",
+      "html": "<span class=\"ds-care-pill ds-home\"><i></i>Home care</span> <span class=\"ds-care-pill ds-gp\"><i></i>Call GP</span> <span class=\"ds-care-pill ds-urgent\"><i></i>Urgent</span>",
+      "css": ".ds-care-pill { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px 3px 7px; border-radius: 999px; font-family: Geist, system-ui, sans-serif; font-size: 12px; font-weight: 600; line-height: 1.2; } .ds-care-pill i { width: 7px; height: 7px; border-radius: 50%; } .ds-home { background: #E2F5EC; color: #006B45; } .ds-home i { background: #00A86B; } .ds-gp { background: #FFF0D9; color: #8A5200; } .ds-gp i { background: #FFA412; } .ds-urgent { background: #FFE4E7; color: #B0142A; } .ds-urgent i { background: #F2384A; }"
+    },
+    {
+      "name": "Continue Row",
+      "kind": "card",
+      "refersTo": "continue-square",
+      "description": "Open row closed by hairlines: topic square, title, when, care pill, preview.",
+      "html": "<a class=\"ds-cont\" href=\"#\"><span class=\"ds-csq\"><svg width=\"26\" height=\"26\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M11 2v2\"/><path d=\"M5 2v2\"/><path d=\"M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1\"/><path d=\"M8 15a6 6 0 0 0 12 0v-3\"/><circle cx=\"20\" cy=\"10\" r=\"2\"/></svg></span><span class=\"ds-ct\"><b>Fever after vaccines</b><span class=\"ds-cm\"><time>Today &middot; 10:24</time><span class=\"ds-cp\"><i></i>Home care</span></span><small>Emma has a fever after her vaccines this morning.</small></span><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"ds-cchev\"><path d=\"m9 18 6-6-6-6\"/></svg></a>",
+      "css": ".ds-cont { display: flex; align-items: center; gap: 16px; max-width: 420px; padding: 16px 0; border-top: 1px solid #EAE3EC; border-bottom: 1px solid #EAE3EC; text-decoration: none; font-family: Geist, system-ui, sans-serif; } .ds-cont:hover { background: #F5F0F7; } .ds-cont:focus-visible { outline: 2px solid #7B57DB; outline-offset: 2px; } .ds-csq { flex: none; display: grid; place-items: center; width: 64px; height: 64px; border-radius: 18px; background: #FCE8EF; color: #B8436A; } .ds-ct { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; } .ds-ct b { font-size: 17px; font-weight: 600; letter-spacing: -0.2px; color: #1F1B3D; } .ds-cm { display: flex; align-items: center; gap: 8px; } .ds-cm time { font-size: 13px; font-weight: 500; color: #6B6781; font-variant-numeric: tabular-nums; } .ds-cp { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px 3px 7px; border-radius: 999px; background: #E2F5EC; color: #006B45; font-size: 12px; font-weight: 600; } .ds-cp i { width: 7px; height: 7px; border-radius: 50%; background: #00A86B; } .ds-ct small { font-size: 14px; line-height: 1.4; color: #6B6781; } .ds-cchev { flex: none; color: #6B6781; }"
+    },
+    {
+      "name": "Question Bubble and Answer on the Rail",
+      "kind": "custom",
+      "refersTo": "question-bubble",
+      "description": "Parent's mist bubble with ink text and a tail corner; Mother AI's unboxed answer with margin-numbered steps on a hairline rail.",
+      "html": "<div class=\"ds-rail\"><div class=\"ds-q\">She has a fever after her vaccines. Is that normal?</div><div class=\"ds-a\"><span class=\"ds-node\"></span><p>A mild fever in the day or two after vaccines is common.</p><ol><li>Offer extra feeds.</li><li>Keep her in light layers.</li></ol></div></div>",
+      "css": ".ds-rail { position: relative; max-width: 420px; padding-left: 40px; font-family: Geist, system-ui, sans-serif; font-size: 16px; line-height: 1.5; color: #1F1B3D; background: #FFFCF9; } .ds-rail::before { content: ''; position: absolute; left: 13.25px; top: 0; bottom: 0; width: 1.5px; background: #EAE3EC; } .ds-q { margin-left: auto; width: fit-content; max-width: 100%; padding: 12px 16px; background: #F3EDFB; color: #1F1B3D; border-radius: 20px 20px 6px 20px; margin-bottom: 20px; animation: ds-rise 380ms cubic-bezier(0.16,1,0.3,1) both; transform-origin: bottom right; } .ds-a { position: relative; } .ds-node { position: absolute; left: -40px; top: 0; width: 28px; height: 28px; border-radius: 50%; border: 1px solid #EAE3EC; background: #FFFCF9; } .ds-a p { margin: 3px 0 12px; } .ds-a ol { list-style: none; counter-reset: s; margin: 0; padding: 0; } .ds-a li { counter-increment: s; display: flex; margin-bottom: 8px; } .ds-a li::before { content: counter(s); flex: none; width: 24px; color: #7B57DB; font-weight: 700; font-variant-numeric: tabular-nums; } @keyframes ds-rise { from { opacity: 0; transform: translateY(40%) scale(0.96); } to { opacity: 1; transform: none; } } @media (prefers-reduced-motion: reduce) { .ds-q { animation: none; } }"
+    },
+    {
+      "name": "Tab Bar",
+      "kind": "nav",
+      "refersTo": "nav-bar",
+      "description": "Docked tab bar; the open tab is a solid violet pill with its label.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-tab ds-tab-on\" href=\"#\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8\"/><path d=\"M3 10a2 2 0 0 1 .7-1.5l7-6a2 2 0 0 1 2.6 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/></svg><span>Home</span></a><a class=\"ds-tab\" href=\"#\" aria-label=\"Chats\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z\"/><path d=\"M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1\"/></svg></a><a class=\"ds-tab\" href=\"#\" aria-label=\"Learn\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 7v14\"/><path d=\"M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z\"/></svg></a><a class=\"ds-tab\" href=\"#\" aria-label=\"Profile\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 0 0-16 0\"/></svg></a></nav>",
+      "css": ".ds-nav { display: flex; align-items: center; max-width: 520px; height: 64px; padding: 0 12px; background: #FFFCF9; border-top: 1px solid #EAE3EC; } .ds-tab { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; height: 44px; color: #6B6781; text-decoration: none; border-radius: 999px; font-family: Geist, system-ui, sans-serif; font-size: 14px; font-weight: 600; transition: background 560ms cubic-bezier(0.16,1,0.3,1), color 560ms cubic-bezier(0.16,1,0.3,1), flex-grow 560ms cubic-bezier(0.16,1,0.3,1); } .ds-tab:active { transform: scale(0.88); } .ds-tab:hover { color: #1F1B3D; } .ds-tab:focus-visible { outline: 2px solid #7B57DB; outline-offset: 2px; } .ds-tab-on { flex: 1.6; background: #7B57DB; color: #FFFFFF; } .ds-tab-on:hover { color: #FFFFFF; background: #6A45CC; } @media (prefers-reduced-motion: reduce) { .ds-tab { transition: none; } }"
+    },
+    {
+      "name": "Settings Group",
+      "kind": "card",
+      "refersTo": "settings-row",
+      "description": "Open rows under a sentence-case label: full hairlines above and below, inset hairlines between.",
+      "html": "<div class=\"ds-sg\"><div class=\"ds-sg-h\">Preferences</div><a class=\"ds-sg-row\" href=\"#\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20\"/><path d=\"M2 12h20\"/></svg><span>Language</span><em>English</em><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"ds-sg-chev\"><path d=\"m9 18 6-6-6-6\"/></svg></a><a class=\"ds-sg-row\" href=\"#\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M10.268 21a2 2 0 0 0 3.464 0\"/><path d=\"M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326\"/></svg><span>Push notifications</span><i class=\"ds-switch\"></i></a></div>",
+      "css": ".ds-sg { max-width: 420px; font-family: Geist, system-ui, sans-serif; background: #FFFCF9; border-bottom: 1px solid #EAE3EC; } .ds-sg-h { padding-bottom: 8px; border-bottom: 1px solid #EAE3EC; font-size: 13px; font-weight: 600; color: #6B6781; } .ds-sg-row { display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 10px 0; color: #1F1B3D; text-decoration: none; font-size: 16px; font-weight: 500; position: relative; } .ds-sg-row + .ds-sg-row::before { content: ''; position: absolute; top: 0; left: 36px; right: 0; height: 1px; background: #EAE3EC; } .ds-sg-row > svg:first-child { color: #6B6781; flex: none; width: 24px; } .ds-sg-row span { flex: 1; } .ds-sg-row em { font-style: normal; font-size: 14px; font-weight: 400; color: #6B6781; } .ds-sg-chev { color: #6B6781; } .ds-sg-row:hover { background: #F5F0F7; } .ds-sg-row:focus-visible { outline: 2px solid #7B57DB; outline-offset: -2px; } .ds-switch { width: 46px; height: 26px; border-radius: 13px; background: #7B57DB; position: relative; } .ds-switch::after { content: ''; position: absolute; right: 3px; top: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; }"
+    },
+    {
+      "name": "Stage Panel",
+      "kind": "card",
+      "refersTo": "stage-panel",
+      "description": "The child's stage on their tint, with a faint sprig in their hue: context, not a question.",
+      "html": "<div class=\"ds-stage\"><svg class=\"ds-sprig\" viewBox=\"0 0 132 120\"><path d=\"M69 120 Q66 74 74 43\" stroke=\"currentColor\" stroke-width=\"5\" stroke-linecap=\"round\" fill=\"none\"/><path d=\"M73 53c-10-9-40-12-50-4 10 8 40 8 50 4z\" fill=\"currentColor\"/><path d=\"M73 53c8-12 40-24 56-22-6 13-40 24-56 22z\" fill=\"currentColor\"/></svg><h3>Emma at <span>6 months</span></h3><p>What&rsquo;s typical right now</p><ul><li>Ready to try first foods</li><li>Sitting up with a little support</li><li>First teeth may be on the way</li></ul></div>",
+      "css": ".ds-stage { position: relative; overflow: hidden; max-width: 420px; padding: 22px 22px 20px; background: #FBEAF3; border-radius: 24px; font-family: Geist, system-ui, sans-serif; color: #1F1B3D; } .ds-sprig { position: absolute; top: -6px; right: -10px; width: 132px; height: 120px; color: rgba(194,63,132,0.16); } .ds-stage h3 { margin: 0; font-family: Urbanist, sans-serif; font-size: 24px; font-weight: 700; line-height: 1.12; letter-spacing: -0.5px; font-variant-numeric: tabular-nums; } .ds-stage h3 span { color: #C23F84; } .ds-stage p { margin: 4px 0 14px; font-size: 14px; color: #6B6781; } .ds-stage ul { list-style: none; margin: 0; padding: 0; } .ds-stage li { display: flex; align-items: center; gap: 12px; padding: 5px 0; font-size: 16px; line-height: 1.5; } .ds-stage li::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #C23F84; flex: none; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Lavender Morning",
+    "overview": "Mother AI is a soft, warm companion. The interface is plum ink on a milk ground, the same field the app icon sits on. Lavender is Mother AI's own colour, and the lavender morning on Home is the one place it spreads into a mood. The world is set by the user's reference screenshot (29 Sep 2026) and applies to every screen. It replaces the ink \"Care Signal\" field, the circles-of-care rings and the cool white ground.\n\nHome opens on that morning. A mist wash runs up under the status bar and fades into the milk ground below the composer. A sprig of drawn leaves reaches in from the trailing edge and bleeds off the top. The leaves move only when something happens. They sway in as Home appears, lean in and breathe while the composer has focus, rustle on each keystroke, and re-tint toward the child's hue when the child changes. Then they come to rest. Everything under the morning is ink on milk: open rows closed by warm hairlines, one tone panel for the child's stage, and photos only where Learn supplies them.\n\nWarmth does not blur meaning. Green, amber and red still mean care level and nothing else. Violet is still Mother AI speaking. Each child keeps a hue of their own, and each topic carries one of the logo's soft hues (rose, peach, sky, lavender, orchid), so none of them can be mistaken for a care signal. The density is relaxed. Each screen has one obvious action, and motion is quick off the mark with a long settle and no overshoot.",
+    "keyCharacteristics": [
+      "Plum ink on milk, with lavender reserved for Mother AI's voice and Home's morning.",
+      "Drawn leaves on Home's mist wash that move on events and then stop.",
+      "Open rows with 1px warm hairlines. Lists are never boxed into cards.",
+      "One resting shadow in the app: Home's raised composer.",
+      "One Urbanist display headline per screen. Everything read or tapped is Geist, and numbers use tabular figures.",
+      "One motion curve (cubic-bezier(0.16, 1, 0.3, 1)), and every animation has a reduced-motion path."
+    ],
+    "rules": [
+      {
+        "name": "The Triage Rule",
+        "body": "Green, amber and red mean care level and nothing else. They are never used for success toasts, warnings, charts, topics or decoration.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Voice Rule",
+        "body": "Violet belongs to Mother AI and to selection. Primary buttons are plum ink, even when the action is \"ask\".",
+        "section": "colors"
+      },
+      {
+        "name": "The Say-It-Once Rule",
+        "body": "A care level appears once per answer as a single strip. In a list it shrinks to a pill with one word (\"Home care\", \"Call GP\", \"Urgent\").",
+        "section": "colors"
+      },
+      {
+        "name": "The Hue-Has-One-Job Rule",
+        "body": "A topic hue marks a topic and a child hue marks a child. Neither is borrowed for the other or for decoration.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Headline Rule",
+        "body": "Each screen gets exactly one display-scale line, at the top. Everything below it steps down the scale.",
+        "section": "typography"
+      },
+      {
+        "name": "The Sentence-Case Label Rule",
+        "body": "Labels and section heads are sentence case, never tracked capitals, and nothing sits above a headline as a kicker. The greeting goes into the subline under it.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tabular Figures Rule",
+        "body": "Any number a parent compares (times, ages, dates, minutes, step numbers) uses tabular figures.",
+        "section": "typography"
+      },
+      {
+        "name": "The One Lift Rule",
+        "body": "Home's composer is the only surface that carries a shadow at rest. Every other card, row, tile, button and sheet is flat. Shadow otherwise exists only while something moves over something else.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do use a care level's full triad together: signal for the disc or dot, tint for the field, deep for text and the action button.",
+      "Do give every amber or red care level its next step as a full-width button in the level's deep shade.",
+      "Do open each screen with one Urbanist display headline and set everything else in Geist.",
+      "Do set times, ages, dates, read lengths and step numbers with tabular figures.",
+      "Do keep rows open: full-width hairlines above and below a group, inset hairlines between rows.",
+      "Do keep Home's composer the one raised surface: white on the mist, with the composer lift.",
+      "Do let the morning leaves move only in response to an event, then settle and stop the ticker.",
+      "Do animate on the settle curve, cubic-bezier(0.16, 1, 0.3, 1), and give every animation a reduced-motion path.",
+      "Do show a child's name in their own hue wherever the name sets who a question is about."
+    ],
+    "donts": [
+      "Don't use green, amber or red for anything but care level, including success states, warnings, topics and decoration.",
+      "Don't fill primary buttons with violet. Primary is plum ink, and violet is Mother AI's voice.",
+      "Don't box a list into a bordered card. That includes settings groups.",
+      "Don't add a second resting shadow. Tone and hairline carry depth everywhere except the Home composer.",
+      "Don't set labels in tracked capitals or put a kicker above a headline.",
+      "Don't set gradient text, or use a gradient anywhere except Home's mist-to-milk wash and the logo mark.",
+      "Don't set body or UI text in Urbanist, or headlines in Geist."
+    ]
+  }
+}

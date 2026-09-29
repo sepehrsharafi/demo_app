@@ -1,766 +1,747 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
+import '../../core/l10n/l10n.dart';
+import '../../core/models/ask_topic.dart';
+import '../../core/theme/app_motion.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/widgets/beneath_island.dart';
+import '../../core/widgets/directional_icons.dart';
+import '../../core/widgets/text_menu.dart';
+import '../chat/chat_page.dart';
+import 'articles.dart';
+import 'open_article.dart';
+import 'widgets/article_meta.dart';
 
-/// The Learn tab's body: one big featured article followed by a list of
-/// smaller article cards. Every card — featured or not — carries an image.
-class LearnTab extends StatelessWidget {
+/// The Learn tab: search and topics up top, a lead article with its photo,
+/// then the rest. Most are read in the app; links to pages elsewhere look
+/// different and open in the browser. When nothing matches, Mother AI
+/// offers to answer the question instead.
+class LearnTab extends StatefulWidget {
   const LearnTab({super.key});
 
-  static const _featured = _Article(
-    category: 'GROWTH',
-    accent: Color(0xFF6C8E7D),
-    title: 'Understanding growth spurts',
-    snippet:
-        'Why sudden growth and crankiness often go together, and how to '
-        'support your child through one.',
-    imagePath: 'assets/images/learn_growth_feature.webp',
-    readTime: '5 min read',
-    source: 'Cleveland Clinic',
-  );
+  @override
+  State<LearnTab> createState() => _LearnTabState();
+}
 
-  static const _articles = <_Article>[
-    _Article(
-      category: 'HEALTH',
-      accent: Color(0xFFB96F72),
-      title: 'Fever 101: when to worry',
-      snippet: 'What counts as mild, and the signs that mean call the doctor.',
-      imagePath: 'assets/images/learn_fever.webp',
-      readTime: '4 min read',
-      source: 'HealthyChildren.org',
-    ),
-    _Article(
-      category: 'SLEEP',
-      accent: Color(0xFF65749B),
-      title: 'Building a bedtime routine',
-      snippet: 'A simple, repeatable wind-down that helps sleep click.',
-      imagePath: 'assets/images/learn_bedtime.webp',
-      readTime: '6 min read',
-      source: 'NHS',
-    ),
-    _Article(
-      category: 'PARENTING',
-      accent: Color(0xFFB87564),
-      title: 'Positive discipline basics',
-      snippet: 'Setting boundaries with warmth instead of power struggles.',
-      imagePath: 'assets/images/learn_positive_discipline.webp',
-      readTime: '7 min read',
-      source: 'UNICEF Parenting',
-    ),
-  ];
+class _LearnTabState extends State<LearnTab> {
+  final _search = TextEditingController();
+  AskTopic? _topic;
+  String _query = '';
 
-  void _showComingSoon(BuildContext context, String title) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text('“$title” — full article coming soon'),
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: AppColors.navy,
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
+
+  bool _matches(Article article) {
+    if (_topic != null && article.topic != _topic) return false;
+    final query = _query.trim().toLowerCase();
+    if (query.isEmpty) return true;
+    // Searched in the words the parent reads.
+    return context.tr(article.title).toLowerCase().contains(query) ||
+        context.tr(article.summary).toLowerCase().contains(query) ||
+        context.tr(article.topic.label).toLowerCase().contains(query);
+  }
+
+  void _clearSearch() {
+    _search.clear();
+    setState(() => _query = '');
+  }
+
+  void _askInstead() {
+    final query = _query.trim();
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        // The search goes in the field for the parent to finish; a topic
+        // only frames the chat when there was nothing typed.
+        builder: (_) => ChatPage(
+          initialDraft: query.isEmpty ? null : query,
+          topic: query.isEmpty ? _topic : null,
         ),
-      );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    return Stack(
-      children: [
-        const Positioned.fill(child: _LearnBackground()),
-        SafeArea(
-          bottom: false,
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 540),
-              child: CustomScrollView(
-                physics: const BouncingScrollPhysics(),
-                slivers: [
-                  SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(18, 24, 18, 4),
-                    sliver: SliverToBoxAdapter(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Learn', style: textTheme.displayLarge),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Practical tips, trusted guidance.',
-                            style: textTheme.bodyLarge,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(18, 18, 18, 128),
-                    sliver: SliverList.list(
-                      children: [
-                        _FeaturedArticleCard(
-                          data: _featured,
-                          onTap: () =>
-                              _showComingSoon(context, _featured.title),
-                        ),
-                        const SizedBox(height: 28),
-                        LayoutBuilder(
-                          builder: (context, constraints) => Row(
-                            children: [
-                              ConstrainedBox(
-                                constraints: BoxConstraints(
-                                  maxWidth: constraints.maxWidth - 12,
-                                ),
-                                child: Text(
-                                  'More to explore',
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: textTheme.titleMedium?.copyWith(
-                                    fontSize: 15,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              const Expanded(
-                                child: Divider(
-                                  color: AppColors.line,
-                                  height: 1,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-                        for (var i = 0; i < _articles.length; i++) ...[
-                          _ArticleCard(
-                            data: _articles[i],
-                            onTap: () =>
-                                _showComingSoon(context, _articles[i].title),
-                          ),
-                          if (i != _articles.length - 1)
-                            const SizedBox(height: 12),
-                        ],
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-/// The lead story is treated like an editorial cover rather than a standard
-/// image-and-text card.
-class _FeaturedArticleCard extends StatelessWidget {
-  const _FeaturedArticleCard({required this.data, required this.onTap});
-
-  final _Article data;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final imageCacheWidth =
-            (constraints.maxWidth * MediaQuery.devicePixelRatioOf(context))
-                .ceil();
-        return Material(
-          color: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
-            side: const BorderSide(color: AppColors.line),
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            onTap: onTap,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                AspectRatio(
-                  aspectRatio: 354 / 245,
-                  child: ClipPath(
-                    clipper: const _FeatureImageClipper(),
-                    child: Image.asset(
-                      data.imagePath,
-                      fit: BoxFit.cover,
-                      alignment: const Alignment(0.3, -0.12),
-                      cacheWidth: imageCacheWidth,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 5, 20, 19),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      LayoutBuilder(
-                        builder: (context, constraints) => Row(
-                          children: [
-                            ConstrainedBox(
-                              constraints: BoxConstraints(
-                                maxWidth: constraints.maxWidth - 16,
-                              ),
-                              child: Text(
-                                'Editor’s selection',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: Theme.of(context).textTheme.labelMedium
-                                    ?.copyWith(
-                                      color: data.accent,
-                                      fontSize: 12.5,
-                                    ),
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Text(
-                                '${data.source}  ·  ${data.readTime}',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                textAlign: TextAlign.end,
-                                style: const TextStyle(
-                                  color: AppColors.inkMuted,
-                                  fontSize: 10.5,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 11),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            width: 3,
-                            height: 67,
-                            margin: const EdgeInsets.only(top: 2, right: 13),
-                            decoration: BoxDecoration(
-                              color: data.accent,
-                              borderRadius: BorderRadius.circular(99),
-                            ),
-                          ),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  data.title,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineSmall
-                                      ?.copyWith(
-                                        fontSize: 29,
-                                        height: 1,
-                                        letterSpacing: -0.95,
-                                      ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  data.snippet,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: Theme.of(context).textTheme.bodyMedium
-                                      ?.copyWith(fontSize: 13, height: 1.32),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 15),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text(
-                            'Read the story',
-                            style: Theme.of(context).textTheme.labelMedium
-                                ?.copyWith(
-                                  color: AppColors.navy,
-                                  fontStyle: FontStyle.normal,
-                                  fontSize: 12.5,
-                                ),
-                          ),
-                          const SizedBox(width: 7),
-                          const Icon(
-                            Icons.arrow_forward_rounded,
-                            color: AppColors.green,
-                            size: 17,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _FeatureImageClipper extends CustomClipper<Path> {
-  const _FeatureImageClipper();
-
-  @override
-  Path getClip(Size size) {
-    return Path()
-      ..moveTo(0, 0)
-      ..lineTo(0, size.height - 18)
-      ..cubicTo(
-        size.width * 0.28,
-        size.height - 50,
-        size.width * 0.7,
-        size.height + 8,
-        size.width,
-        size.height - 28,
-      )
-      ..lineTo(size.width, 0)
-      ..close();
-  }
-
-  @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
-}
-
-/// A smaller, horizontal card used for every article below the featured one.
-/// The photograph is anchored to the card edge, with only a slight editorial
-/// angle where it meets the article copy.
-class _ArticleCard extends StatelessWidget {
-  const _ArticleCard({required this.data, required this.onTap});
-
-  final _Article data;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final imageWidth = constraints.maxWidth * 126 / 354;
-        final imageCacheWidth =
-            (imageWidth * MediaQuery.devicePixelRatioOf(context)).ceil();
-        return Material(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(26),
-          clipBehavior: Clip.antiAlias,
-          child: Ink(
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFFEFC),
-              borderRadius: BorderRadius.circular(26),
-              border: Border.all(color: const Color(0xFFECE8E3)),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x0D10265A),
-                  blurRadius: 18,
-                  offset: Offset(0, 7),
-                ),
-              ],
-            ),
-            child: InkWell(
-              onTap: onTap,
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(minHeight: 164),
-                child: Stack(
-                  children: [
-                    Positioned(
-                      left: 0,
-                      top: 0,
-                      bottom: 0,
-                      width: imageWidth,
-                      child: ClipPath(
-                        clipper: const _AngledImageClipper(),
-                        child: Stack(
-                          fit: StackFit.expand,
-                          children: [
-                            Image.asset(
-                              data.imagePath,
-                              fit: BoxFit.cover,
-                              cacheWidth: imageCacheWidth,
-                            ),
-                            const DecoratedBox(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    Colors.transparent,
-                                    Color(0x2B13213B),
-                                  ],
-                                  stops: [0.64, 1],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(left: imageWidth),
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(10, 14, 14, 13),
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(minHeight: 137),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  LayoutBuilder(
-                                    builder: (context, constraints) => Row(
-                                      children: [
-                                        ConstrainedBox(
-                                          constraints: BoxConstraints(
-                                            maxWidth: constraints.maxWidth - 28,
-                                          ),
-                                          child: _CategoryTag(
-                                            text: data.category,
-                                            color: data.accent,
-                                          ),
-                                        ),
-                                        const Spacer(),
-                                        Container(
-                                          width: 28,
-                                          height: 28,
-                                          decoration: BoxDecoration(
-                                            color: data.accent.withValues(
-                                              alpha: 0.1,
-                                            ),
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: Icon(
-                                            Icons.arrow_outward_rounded,
-                                            color: data.accent,
-                                            size: 15,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    data.title,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium
-                                        ?.copyWith(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                          letterSpacing: -0.3,
-                                        ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    data.snippet,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium
-                                        ?.copyWith(
-                                          fontSize: 11.7,
-                                          height: 1.25,
-                                        ),
-                                  ),
-                                ],
-                              ),
-                              _SourceLine(
-                                source: data.source,
-                                readTime: data.readTime,
-                                color: data.accent,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _CategoryTag extends StatelessWidget {
-  const _CategoryTag({required this.text, required this.color});
-
-  final String text;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(999),
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        child: Text(
-          text,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            color: color,
-            fontSize: 9.5,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 1.25,
-          ),
-        ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final found = learnLibrary.where(_matches).toList();
+    // A lead needs a photo, and a search reads better as a plain list.
+    final lead = _query.trim().isEmpty
+        ? found.where((a) => a.imagePath != null).firstOrNull
+        : null;
+    final rest = [
+      for (final article in found)
+        if (!identical(article, lead)) article,
+    ];
+
+    return SafeArea(
+      bottom: false,
+      // The column is phone-width and centred, but the topic row runs to the
+      // screen's edges, so on a tablet it still reads as something to scroll.
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final side = math.max(24.0, (constraints.maxWidth - 560) / 2 + 24);
+          Widget pad(Widget child) => Padding(
+            padding: EdgeInsets.symmetric(horizontal: side),
+            child: child,
+          );
+          return ListView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            padding: const EdgeInsets.only(top: 24, bottom: 128),
+            children: [
+              pad(Text(context.tr('Learn'), style: AppText.display)),
+              const SizedBox(height: 8),
+              pad(
+                Text(
+                  context.tr('Guides for every stage, in plain words.'),
+                  style: AppText.secondary,
+                ),
+              ),
+              const SizedBox(height: 20),
+              pad(
+                _SearchField(
+                  controller: _search,
+                  onChanged: (value) => setState(() => _query = value),
+                  onClear: _clearSearch,
+                ),
+              ),
+              const SizedBox(height: 14),
+              _TopicFilter(
+                inset: side,
+                selected: _topic,
+                onSelected: (topic) => setState(() => _topic = topic),
+              ),
+              const SizedBox(height: 24),
+              pad(
+                _Results(
+                  key: ValueKey('${_topic?.name}|${_query.trim()}'),
+                  lead: lead,
+                  rest: rest,
+                  query: _query.trim(),
+                  topic: _topic,
+                  onOpen: (article) => openArticle(context, article),
+                  onAsk: _askInstead,
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
 }
 
-class _SourceLine extends StatelessWidget {
-  const _SourceLine({
-    required this.source,
-    required this.readTime,
-    required this.color,
+class _SearchField extends StatelessWidget {
+  const _SearchField({
+    required this.controller,
+    required this.onChanged,
+    required this.onClear,
   });
 
-  final String source;
-  final String readTime;
-  final Color color;
+  final TextEditingController controller;
+  final ValueChanged<String> onChanged;
+  final VoidCallback onClear;
+
+  static const _border = ShadBorder(
+    radius: BorderRadius.all(Radius.circular(AppTheme.radius)),
+  );
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) => Row(
+    return ShadInput(
+      contextMenuBuilder: textMenu,
+      controller: controller,
+      placeholder: Text(context.tr('Search guides and topics')),
+      style: AppText.body,
+      placeholderStyle: AppText.body.copyWith(color: AppColors.muted),
+      textInputAction: TextInputAction.search,
+      onChanged: onChanged,
+      padding: const EdgeInsetsDirectional.fromSTEB(14, 4, 4, 4),
+      constraints: const BoxConstraints(minHeight: 48),
+      crossAxisAlignment: CrossAxisAlignment.center,
+      decoration: const ShadDecoration(
+        color: AppColors.panel,
+        border: _border,
+        focusedBorder: _border,
+      ),
+      leading: const Icon(LucideIcons.search, size: 18, color: AppColors.muted),
+      trailing: ValueListenableBuilder<TextEditingValue>(
+        valueListenable: controller,
+        builder: (context, value, _) => value.text.isEmpty
+            ? const SizedBox(height: 40)
+            : ShadIconButton.ghost(
+                width: 40,
+                height: 40,
+                iconSize: 16,
+                foregroundColor: AppColors.muted,
+                icon: Icon(
+                  LucideIcons.x,
+                  semanticLabel: context.tr('Clear search'),
+                ),
+                onPressed: onClear,
+              ),
+      ),
+    );
+  }
+}
+
+/// "All" and the five topics, in a row that runs off the edge so it reads
+/// as something to scroll. A chosen chip slides fully into view.
+class _TopicFilter extends StatefulWidget {
+  const _TopicFilter({
+    required this.inset,
+    required this.selected,
+    required this.onSelected,
+  });
+
+  /// Where the first chip starts, in line with the column.
+  final double inset;
+
+  final AskTopic? selected;
+  final ValueChanged<AskTopic?> onSelected;
+
+  @override
+  State<_TopicFilter> createState() => _TopicFilterState();
+}
+
+class _TopicFilterState extends State<_TopicFilter> {
+  final _keys = {for (final topic in AskTopic.values) topic: GlobalKey()};
+
+  void _choose(AskTopic? topic) {
+    widget.onSelected(topic);
+    final key = topic == null ? null : _keys[topic];
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final chip = key?.currentContext;
+      if (chip == null || !chip.mounted) return;
+      Scrollable.ensureVisible(
+        chip,
+        alignment: 0.5,
+        duration: const Duration(milliseconds: 420),
+        curve: AppMotion.settle,
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final selected = widget.selected;
+    return SizedBox(
+      height: 42,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.symmetric(horizontal: widget.inset),
         children: [
-          Container(
-            width: 18,
-            height: 18,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.12),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(Icons.public_rounded, color: color, size: 11),
+          _FilterChip(
+            topic: null,
+            selected: selected == null,
+            onTap: () => _choose(null),
           ),
-          const SizedBox(width: 6),
-          Flexible(
-            child: Text.rich(
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              TextSpan(
-                children: [
-                  const TextSpan(text: 'From  '),
-                  TextSpan(
-                    text: source,
-                    style: const TextStyle(
-                      color: AppColors.navy,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
-              ),
-              style: const TextStyle(
-                color: AppColors.inkMuted,
-                fontSize: 9.5,
-                fontWeight: FontWeight.w600,
-              ),
+          for (final topic in AskTopic.values) ...[
+            const SizedBox(width: 8),
+            _FilterChip(
+              key: _keys[topic],
+              topic: topic,
+              selected: selected == topic,
+              onTap: () => _choose(selected == topic ? null : topic),
             ),
-          ),
-          const SizedBox(width: 5),
-          ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: constraints.maxWidth - 29),
-            child: Text(
-              readTime.toUpperCase(),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: AppColors.inkMuted,
-                fontSize: 8.5,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0.65,
-              ),
-            ),
-          ),
+          ],
         ],
       ),
     );
   }
 }
 
-class _AngledImageClipper extends CustomClipper<Path> {
-  const _AngledImageClipper();
+class _FilterChip extends StatelessWidget {
+  const _FilterChip({
+    super.key,
+    required this.topic,
+    required this.selected,
+    required this.onTap,
+  });
 
-  @override
-  Path getClip(Size size) {
-    return Path()
-      ..lineTo(size.width - 12, 0)
-      ..lineTo(size.width, size.height)
-      ..lineTo(0, size.height)
-      ..close();
-  }
+  /// Null is "All".
+  final AskTopic? topic;
+  final bool selected;
+  final VoidCallback onTap;
 
-  @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
-}
-
-class _LearnBackground extends StatelessWidget {
-  const _LearnBackground();
+  static const _duration = Duration(milliseconds: 220);
 
   @override
   Widget build(BuildContext context) {
-    return const IgnorePointer(
-      child: ColoredBox(
-        color: AppColors.background,
-        child: CustomPaint(painter: _LearnBackgroundPainter()),
+    final topic = this.topic;
+    return Semantics(
+      button: true,
+      selected: selected,
+      child: AnimatedContainer(
+        duration: _duration,
+        curve: AppMotion.settle,
+        decoration: ShapeDecoration(
+          color: selected ? AppColors.voice : AppColors.ground,
+          shape: StadiumBorder(
+            side: BorderSide(
+              color: selected ? AppColors.voice : AppColors.line,
+            ),
+          ),
+        ),
+        child: Material(
+          type: MaterialType.transparency,
+          shape: const StadiumBorder(),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: onTap,
+            child: Padding(
+              padding: EdgeInsetsDirectional.fromSTEB(
+                topic == null ? 18 : 5,
+                0,
+                16,
+                0,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (topic != null) ...[
+                    AnimatedContainer(
+                      duration: _duration,
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        color: selected ? const Color(0x33FFFFFF) : topic.tint,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        topic.icon,
+                        size: 15,
+                        color: selected ? Colors.white : topic.tone,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                  ],
+                  Text(
+                    context.tr(topic?.label ?? 'All'),
+                    style: AppText.rowTitle.copyWith(
+                      fontSize: 14,
+                      color: selected ? Colors.white : AppColors.ink,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
 }
 
-class _LearnBackgroundPainter extends CustomPainter {
-  const _LearnBackgroundPainter();
+/// What the search and topic turn up. A new filter's results rise into
+/// place over the ground.
+class _Results extends StatelessWidget {
+  const _Results({
+    super.key,
+    required this.lead,
+    required this.rest,
+    required this.query,
+    required this.topic,
+    required this.onOpen,
+    required this.onAsk,
+  });
+
+  final Article? lead;
+  final List<Article> rest;
+  final String query;
+  final AskTopic? topic;
+  final ValueChanged<Article> onOpen;
+  final VoidCallback onAsk;
 
   @override
-  void paint(Canvas canvas, Size size) {
-    // Overlapping translucent fields bring the multi-color atmosphere from
-    // the other tabs into Learn while leaving the title area calm and clear.
-    final blushBounds = Rect.fromLTWH(-90, -48, 265, 220);
-    canvas.drawOval(
-      blushBounds,
-      Paint()
-        ..shader = const RadialGradient(
-          center: Alignment(-0.15, -0.2),
-          colors: [Color(0x99FFE1DD), Color(0x00FFE1DD)],
-        ).createShader(blushBounds),
-    );
-
-    final lavenderWash = Path()
-      ..moveTo(size.width * 0.3, 0)
-      ..cubicTo(
-        size.width * 0.38,
-        54,
-        size.width * 0.43,
-        137,
-        size.width * 0.67,
-        165,
-      )
-      ..cubicTo(size.width * 0.84, 184, size.width + 18, 132, size.width, 0)
-      ..close();
-    canvas.drawPath(lavenderWash, Paint()..color = const Color(0x66EEE8FF));
-
-    final skyBounds = Rect.fromLTWH(size.width * 0.42, -42, 210, 175);
-    canvas.drawOval(
-      skyBounds,
-      Paint()
-        ..shader = const RadialGradient(
-          colors: [Color(0x88DCEAFF), Color(0x00DCEAFF)],
-        ).createShader(skyBounds),
-    );
-
-    final topCenter = Offset(size.width + 5, 82);
-    canvas.drawCircle(topCenter, 112, Paint()..color = const Color(0x88DDF4EC));
-    canvas.drawCircle(
-      Offset(size.width - 5, 72),
-      71,
-      Paint()
-        ..color = const Color(0x336C8E7D)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.1,
-    );
-
-    final blushContour = Path()
-      ..moveTo(0, 116)
-      ..cubicTo(38, 100, 82, 108, 112, 143);
-    canvas.drawPath(
-      blushContour,
-      Paint()
-        ..color = const Color(0x40E96862)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.1,
-    );
-
-    // A broad paper-like fold enters from the left and sits behind the list.
-    final leftFold = Path()
-      ..moveTo(0, size.height * 0.42)
-      ..cubicTo(
-        48,
-        size.height * 0.39,
-        78,
-        size.height * 0.46,
-        61,
-        size.height * 0.54,
-      )
-      ..cubicTo(
-        45,
-        size.height * 0.61,
-        17,
-        size.height * 0.64,
-        0,
-        size.height * 0.65,
-      )
-      ..close();
-    canvas.drawPath(leftFold, Paint()..color = const Color(0x55E7F0FF));
-
-    // One fine contour gives the flat color fields a little dimensionality.
-    final contour = Path()
-      ..moveTo(0, size.height * 0.48)
-      ..cubicTo(
-        30,
-        size.height * 0.46,
-        58,
-        size.height * 0.49,
-        49,
-        size.height * 0.56,
+  Widget build(BuildContext context) {
+    final lead = this.lead;
+    final Widget content;
+    if (lead == null && rest.isEmpty) {
+      content = _Empty(query: query, topic: topic, onAsk: onAsk);
+    } else {
+      content = Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (lead != null) ...[
+            _LeadArticle(article: lead, onTap: () => onOpen(lead)),
+            const SizedBox(height: 32),
+          ],
+          if (rest.isNotEmpty) ...[
+            Text(
+              lead == null
+                  ? context.tr('{n} to read', {'n': rest.length})
+                  : context.tr('More to read'),
+              style: AppText.section,
+            ),
+            const SizedBox(height: 6),
+            for (final (i, article) in rest.indexed)
+              _ArticleRow(
+                article: article,
+                divider: i != 0,
+                onTap: () => onOpen(article),
+              ),
+          ],
+        ],
       );
-    canvas.drawPath(
-      contour,
-      Paint()
-        ..color = const Color(0x305E83A1)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1,
+    }
+    return content.maybeAnimate(
+      context,
+      (content) => content
+          .animate()
+          .veilIn(duration: 240.ms, curve: Curves.easeOut)
+          .slideY(
+            begin: 0.03,
+            end: 0,
+            duration: 420.ms,
+            curve: AppMotion.settle,
+          ),
     );
+  }
+}
 
-    final bottomShape = Path()
-      ..moveTo(size.width, size.height * 0.73)
-      ..cubicTo(
-        size.width - 50,
-        size.height * 0.75,
-        size.width - 78,
-        size.height * 0.84,
-        size.width - 45,
-        size.height,
-      )
-      ..lineTo(size.width, size.height)
-      ..close();
-    canvas.drawPath(bottomShape, Paint()..color = const Color(0x4DF1ECFA));
+/// The lead: a large photo carrying its topic, then the title, what the
+/// article will tell you, and the way in.
+class _LeadArticle extends StatelessWidget {
+  const _LeadArticle({required this.article, required this.onTap});
+
+  final Article article;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final image = article.imagePath!;
+    return Semantics(
+      button: true,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Stack(
+              children: [
+                Hero(
+                  flightShuttleBuilder: flyBeneathIsland,
+                  tag: image,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: AspectRatio(
+                      aspectRatio: 16 / 10,
+                      child: Image.asset(
+                        image,
+                        fit: BoxFit.cover,
+                        alignment: const Alignment(0.2, 0),
+                      ),
+                    ),
+                  ),
+                ),
+                PositionedDirectional(
+                  start: 12,
+                  top: 12,
+                  child: _TopicTag(topic: article.topic),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        context.tr(article.title),
+                        style: AppText.title.copyWith(fontSize: 26),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        context.tr(article.summary),
+                        style: AppText.secondary.copyWith(
+                          fontSize: 15,
+                          height: 1.45,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        context.tr('{minutes} min read', {
+                          'minutes': article.minutes!,
+                        }),
+                        style: AppText.figure,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 16),
+                ExcludeSemantics(
+                  child: DecoratedBox(
+                    decoration: const BoxDecoration(
+                      color: AppColors.voiceTint,
+                      shape: BoxShape.circle,
+                    ),
+                    child: SizedBox.square(
+                      dimension: 48,
+                      child: Icon(
+                        context.forwardArrow,
+                        size: 20,
+                        color: AppColors.voice,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// The lead article's topic, set on its photo so it isn't said twice.
+class _TopicTag extends StatelessWidget {
+  const _TopicTag({required this.topic});
+
+  final AskTopic topic;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: const ShapeDecoration(
+        color: AppColors.ground,
+        shape: StadiumBorder(),
+      ),
+      child: Padding(
+        padding: const EdgeInsetsDirectional.fromSTEB(10, 7, 12, 7),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(topic.icon, size: 15, color: topic.tone),
+            const SizedBox(width: 6),
+            Text(
+              context.tr(topic.label),
+              style: AppText.label.copyWith(color: AppColors.ink),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// One item in the list: its picture, title, what it covers and how long it
+/// is. A link elsewhere shows its topic in place of a photo, with the mark
+/// for "opens a website" in both its corner and its trailing arrow.
+class _ArticleRow extends StatelessWidget {
+  const _ArticleRow({
+    required this.article,
+    required this.divider,
+    required this.onTap,
+  });
+
+  final Article article;
+  final bool divider;
+  final VoidCallback onTap;
+
+  static const thumb = 84.0;
+
+  @override
+  Widget build(BuildContext context) {
+    final image = article.imagePath;
+    final outside = article.opensOutside;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        border: divider
+            ? const Border(top: BorderSide(color: AppColors.line))
+            : null,
+      ),
+      child: Semantics(
+        button: true,
+        link: outside,
+        hint: outside ? context.tr('Opens a website') : null,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            child: Row(
+              children: [
+                if (image != null)
+                  Hero(
+                    flightShuttleBuilder: flyBeneathIsland,
+                    tag: image,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(14),
+                      // Full size, shared with the article it opens: the
+                      // photo flies back into this square without going
+                      // soft or being decoded again.
+                      child: Image.asset(
+                        image,
+                        width: thumb,
+                        height: thumb,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  )
+                else
+                  _LinkThumb(topic: article.topic),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        context.tr(article.title),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppText.rowTitle.copyWith(fontSize: 16.5),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        context.tr(article.summary),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppText.secondary,
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Icon(
+                            article.topic.icon,
+                            size: 14,
+                            color: article.topic.tone,
+                          ),
+                          const SizedBox(width: 6),
+                          Flexible(child: ArticleMeta(article: article)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Icon(
+                  outside ? context.outArrow : context.forwardChevron,
+                  size: 18,
+                  color: AppColors.muted,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A link's picture: its topic's square, marked in the corner as a page
+/// elsewhere.
+class _LinkThumb extends StatelessWidget {
+  const _LinkThumb({required this.topic});
+
+  final AskTopic topic;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox.square(
+      dimension: _ArticleRow.thumb,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: topic.tint,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Stack(
+          children: [
+            Center(child: Icon(topic.icon, size: 30, color: topic.tone)),
+            const PositionedDirectional(
+              end: 6,
+              bottom: 6,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                child: SizedBox.square(
+                  dimension: 24,
+                  child: Icon(
+                    LucideIcons.globe,
+                    size: 13,
+                    color: AppColors.ink,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Nothing matched. Learn doesn't leave it there: Mother AI can answer.
+class _Empty extends StatelessWidget {
+  const _Empty({required this.query, required this.topic, required this.onAsk});
+
+  final String query;
+  final AskTopic? topic;
+  final VoidCallback onAsk;
+
+  /// Says what was looked for, filter included.
+  String _headline(BuildContext context) {
+    final topic = this.topic;
+    final args = {
+      'topic': topic == null ? '' : context.tr(topic.label),
+      'query': query,
+    };
+    return context.tr(switch ((topic != null, query.isNotEmpty)) {
+      (false, false) => 'No guides yet',
+      (true, false) => 'No {topic} guides yet',
+      (false, true) => 'No guides on “{query}” yet',
+      (true, true) => 'No {topic} guides on “{query}” yet',
+    }, args);
   }
 
   @override
-  bool shouldRepaint(covariant _LearnBackgroundPainter oldDelegate) => false;
-}
-
-class _Article {
-  const _Article({
-    required this.category,
-    required this.accent,
-    required this.title,
-    required this.snippet,
-    required this.imagePath,
-    required this.readTime,
-    required this.source,
-  });
-
-  final String category;
-  final Color accent;
-  final String title;
-  final String snippet;
-  final String imagePath;
-  final String readTime;
-  final String source;
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              color: AppColors.voiceTint,
+              borderRadius: BorderRadius.all(Radius.circular(16)),
+            ),
+            child: SizedBox.square(
+              dimension: 52,
+              child: Icon(
+                LucideIcons.sparkles,
+                size: 22,
+                color: AppColors.voice,
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(_headline(context), style: AppText.title),
+          const SizedBox(height: 6),
+          Text(
+            context.tr(
+              'Mother AI can still answer it for you, in plain words.',
+            ),
+            style: AppText.secondary,
+          ),
+          const SizedBox(height: 18),
+          ShadButton(
+            leading: const Icon(LucideIcons.messageCircle, size: 18),
+            onPressed: onAsk,
+            child: Text(context.tr('Ask Mother AI')),
+          ),
+        ],
+      ),
+    );
+  }
 }

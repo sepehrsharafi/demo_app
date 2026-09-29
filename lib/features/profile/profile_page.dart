@@ -1,823 +1,288 @@
 import 'package:flutter/material.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
-import '../../core/models/child_profile.dart';
+import '../../core/data/app_scope.dart';
+import '../../core/l10n/l10n.dart';
+import '../../core/models/preferences.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/widgets/child_monogram.dart';
+import 'child_form_page.dart';
+import 'child_sheet.dart';
+import 'document_page.dart';
+import 'documents.dart';
+import 'widgets/contact_sheet.dart';
+import 'widgets/notice_sheet.dart';
+import 'widgets/option_sheet.dart';
+import 'widgets/settings_group.dart';
 
-/// The Profile tab: account, children, preferences, privacy, support and
-/// legal — everything that isn't part of the day-to-day chat flow.
-class ProfileTab extends StatefulWidget {
+/// The Profile tab: the account, the family, and how Mother AI answers.
+class ProfileTab extends StatelessWidget {
   const ProfileTab({super.key});
 
-  @override
-  State<ProfileTab> createState() => _ProfileTabState();
-}
+  /// The account, plans and sign-out are in the design but not built yet:
+  /// they look tappable and do nothing.
+  static void _notYet() {}
 
-class _ProfileTabState extends State<ProfileTab> {
-  bool _pushNotifications = true;
-  bool _dailyTips = true;
-  bool _weeklySummary = false;
-
-  void _showMessage(String message) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(message),
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: AppColors.navy,
-        ),
-      );
-  }
-
-  Future<void> _confirmSignOut() async {
-    final signOut = await _confirm(
-      title: 'Sign out?',
-      message: 'Your chats stay saved to your account.',
-      confirmLabel: 'Sign out',
+  Future<void> _chooseLanguage(BuildContext context) async {
+    final store = AppScope.of(context, listen: false);
+    final language = await pickOption(
+      context,
+      title: context.tr('Language'),
+      description: context.tr('Mother AI answers in this language.'),
+      options: [
+        for (final language in AppLanguage.values)
+          (language, language.nativeName),
+      ],
+      selected: store.language,
     );
-    if (signOut) _showMessage('Signed out');
+    if (language != null) await store.setLanguage(language);
   }
 
-  Future<void> _confirmDeleteAccount() async {
-    final delete = await _confirm(
-      title: 'Delete account?',
-      message:
-          'This permanently removes your account, your children’s '
-          'profiles and every conversation. This cannot be undone.',
-      confirmLabel: 'Delete',
-      destructive: true,
-    );
-    if (delete) _showMessage('Account deletion requested');
-  }
-
-  Future<bool> _confirm({
-    required String title,
-    required String message,
-    required String confirmLabel,
-    bool destructive = false,
-  }) async {
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
-        title: Text(title, style: Theme.of(context).textTheme.titleMedium),
-        content: Text(message, style: Theme.of(context).textTheme.bodyMedium),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text(
-              'Cancel',
-              style: TextStyle(
-                color: AppColors.inkMuted,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text(
-              confirmLabel,
-              style: TextStyle(
-                color: destructive ? AppColors.coral : AppColors.lavender,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        ],
+  Future<void> _chooseUnits(BuildContext context) async {
+    final store = AppScope.of(context, listen: false);
+    final units = await pickOption(
+      context,
+      title: context.tr('Units'),
+      description: context.tr(
+        'How Mother AI writes weights, lengths and temperatures.',
       ),
+      options: [
+        for (final units in Units.values)
+          (
+            units,
+            '${context.tr(units.label)}  ·  ${context.tr(units.examples)}',
+          ),
+      ],
+      selected: store.units,
     );
-    return result ?? false;
+    if (units != null) await store.setUnits(units);
   }
 
-  Future<void> _showDisclaimer() {
-    return showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
-        title: Text(
-          'Medical disclaimer',
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        content: Text(
+  void _showDisclaimer(BuildContext context) {
+    showNoticeSheet(
+      context,
+      title: context.tr('Medical disclaimer'),
+      paragraphs: [
+        context.tr(
           'Mother AI offers general parenting guidance and is not a medical '
-          'service. It cannot diagnose, treat or replace advice from your '
-          'doctor, midwife or health visitor.\n\nIf your child is seriously '
-          'unwell, or you are worried about their breathing, alertness or '
-          'hydration, contact your local emergency number straight away.',
-          style: Theme.of(context).textTheme.bodyMedium,
+          'service. It can’t diagnose, treat or replace advice from your '
+          'doctor, midwife or health visitor.',
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text(
-              'Got it',
-              style: TextStyle(
-                color: AppColors.lavender,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        ],
-      ),
+        context.tr(
+          'If your child is seriously unwell, or you are worried about their '
+          'breathing, alertness or hydration, contact your local emergency '
+          'number straight away.',
+        ),
+      ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-
-    return Stack(
-      children: [
-        const Positioned.fill(child: _ProfileBackground()),
-        SafeArea(
-          bottom: false,
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 540),
-              child: CustomScrollView(
-                physics: const BouncingScrollPhysics(),
-                slivers: [
-                  SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(18, 22, 18, 4),
-                    sliver: SliverToBoxAdapter(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Profile', style: textTheme.displayLarge),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Your account and family.',
-                            style: textTheme.bodyLarge,
-                          ),
-                        ],
-                      ),
+    final store = AppScope.of(context);
+    final l10n = context.l10n;
+    return SafeArea(
+      bottom: false,
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 560),
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 128),
+            children: [
+              Text(context.tr('Profile'), style: AppText.display),
+              const SizedBox(height: 24),
+              const _Account(),
+              const SizedBox(height: 16),
+              const _Plus(),
+              const SizedBox(height: 32),
+              SettingsGroup(
+                heading: context.tr('Children'),
+                rows: [
+                  for (final child in store.children)
+                    SettingsRow(
+                      leading: ChildMonogram(child: child, size: 28),
+                      title: child.name,
+                      subtitle: context.tr('{age} · born {date}', {
+                        'age': l10n.age(child),
+                        'date': l10n.date(child.birthday),
+                      }),
+                      onTap: () => showChildSheet(context, child),
                     ),
-                  ),
-                  SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(18, 18, 18, 128),
-                    sliver: SliverList.list(
-                      children: [
-                        _AccountCard(
-                          onEdit: () => _showMessage('Edit profile'),
-                        ),
-                        const SizedBox(height: 14),
-                        _PlanCard(
-                          onUpgrade: () => _showMessage('Mother AI Plus'),
-                        ),
-
-                        const _GroupLabel('YOUR CHILDREN'),
-                        _SettingsGroup(
-                          children: [
-                            for (final child in demoChildren)
-                              _SettingsRow(
-                                leading: _ChildAvatar(data: child),
-                                title: child.name,
-                                subtitle: '${child.age} · ${child.birthday}',
-                                onTap: () => _showMessage(child.name),
-                              ),
-                            _SettingsRow(
-                              icon: Icons.add_rounded,
-                              iconColor: AppColors.lavender,
-                              iconBackground: const Color(0xFFEEE6FF),
-                              title: 'Add a child',
-                              onTap: () => _showMessage('Add a child'),
-                            ),
-                          ],
-                        ),
-
-                        const _GroupLabel('PREFERENCES'),
-                        _SettingsGroup(
-                          children: [
-                            _SettingsRow(
-                              icon: Icons.notifications_none_rounded,
-                              iconColor: AppColors.lavender,
-                              iconBackground: const Color(0xFFEEE6FF),
-                              title: 'Push notifications',
-                              trailing: _RowSwitch(
-                                value: _pushNotifications,
-                                onChanged: (value) =>
-                                    setState(() => _pushNotifications = value),
-                              ),
-                            ),
-                            _SettingsRow(
-                              icon: Icons.lightbulb_outline_rounded,
-                              iconColor: const Color(0xFFE39A2E),
-                              iconBackground: const Color(0xFFFCEBCF),
-                              title: 'Daily tips',
-                              subtitle: 'One small idea each morning',
-                              trailing: _RowSwitch(
-                                value: _dailyTips,
-                                onChanged: (value) =>
-                                    setState(() => _dailyTips = value),
-                              ),
-                            ),
-                            _SettingsRow(
-                              icon: Icons.insights_rounded,
-                              iconColor: AppColors.green,
-                              iconBackground: const Color(0xFFD8F1E7),
-                              title: 'Weekly summary',
-                              subtitle: 'A recap of what you asked about',
-                              trailing: _RowSwitch(
-                                value: _weeklySummary,
-                                onChanged: (value) =>
-                                    setState(() => _weeklySummary = value),
-                              ),
-                            ),
-                            _SettingsRow(
-                              icon: Icons.language_rounded,
-                              iconColor: AppColors.blue,
-                              iconBackground: AppColors.sky,
-                              title: 'Language',
-                              value: 'English',
-                              onTap: () => _showMessage('Language'),
-                            ),
-                            _SettingsRow(
-                              icon: Icons.straighten_rounded,
-                              iconColor: const Color(0xFF7657EB),
-                              iconBackground: const Color(0xFFE7E1FB),
-                              title: 'Units',
-                              value: 'Metric',
-                              onTap: () => _showMessage('Units'),
-                            ),
-                          ],
-                        ),
-
-                        const _GroupLabel('PRIVACY & DATA'),
-                        _SettingsGroup(
-                          children: [
-                            _SettingsRow(
-                              icon: Icons.lock_outline_rounded,
-                              iconColor: AppColors.blue,
-                              iconBackground: AppColors.sky,
-                              title: 'Data & privacy',
-                              subtitle: 'What we store and why',
-                              onTap: () => _showMessage('Data & privacy'),
-                            ),
-                            _SettingsRow(
-                              icon: Icons.download_rounded,
-                              iconColor: AppColors.green,
-                              iconBackground: const Color(0xFFD8F1E7),
-                              title: 'Export my data',
-                              onTap: () => _showMessage('Export my data'),
-                            ),
-                            _SettingsRow(
-                              icon: Icons.delete_outline_rounded,
-                              iconColor: AppColors.coral,
-                              iconBackground: const Color(0xFFFCE1DF),
-                              title: 'Delete account',
-                              destructive: true,
-                              onTap: _confirmDeleteAccount,
-                            ),
-                          ],
-                        ),
-
-                        const _GroupLabel('SUPPORT'),
-                        _SettingsGroup(
-                          children: [
-                            _SettingsRow(
-                              icon: Icons.help_outline_rounded,
-                              iconColor: AppColors.lavender,
-                              iconBackground: const Color(0xFFEEE6FF),
-                              title: 'Help centre',
-                              onTap: () => _showMessage('Help centre'),
-                            ),
-                            _SettingsRow(
-                              icon: Icons.mail_outline_rounded,
-                              iconColor: AppColors.blue,
-                              iconBackground: AppColors.sky,
-                              title: 'Contact support',
-                              onTap: () => _showMessage('Contact support'),
-                            ),
-                            _SettingsRow(
-                              icon: Icons.favorite_border_rounded,
-                              iconColor: AppColors.coral,
-                              iconBackground: const Color(0xFFFCE1DF),
-                              title: 'Send feedback',
-                              onTap: () => _showMessage('Send feedback'),
-                            ),
-                          ],
-                        ),
-
-                        const _GroupLabel('ABOUT'),
-                        _SettingsGroup(
-                          children: [
-                            _SettingsRow(
-                              icon: Icons.health_and_safety_outlined,
-                              iconColor: AppColors.coral,
-                              iconBackground: const Color(0xFFFCE1DF),
-                              title: 'Medical disclaimer',
-                              subtitle: 'Mother AI is not a doctor',
-                              onTap: _showDisclaimer,
-                            ),
-                            _SettingsRow(
-                              icon: Icons.description_outlined,
-                              iconColor: AppColors.inkMuted,
-                              iconBackground: const Color(0xFFEFF1F7),
-                              title: 'Terms of service',
-                              onTap: () => _showMessage('Terms of service'),
-                            ),
-                            _SettingsRow(
-                              icon: Icons.policy_outlined,
-                              iconColor: AppColors.inkMuted,
-                              iconBackground: const Color(0xFFEFF1F7),
-                              title: 'Privacy policy',
-                              onTap: () => _showMessage('Privacy policy'),
-                            ),
-                            const _SettingsRow(
-                              icon: Icons.info_outline_rounded,
-                              iconColor: AppColors.inkMuted,
-                              iconBackground: Color(0xFFEFF1F7),
-                              title: 'Version',
-                              value: '1.0.0',
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 22),
-                        _SignOutButton(onPressed: _confirmSignOut),
-                        const SizedBox(height: 18),
-                        const Center(
-                          child: Text(
-                            'Made with ♡ for every parent',
-                            style: TextStyle(
-                              color: AppColors.whisper,
-                              fontSize: 12.5,
-                              fontStyle: FontStyle.italic,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                  SettingsRow(
+                    icon: LucideIcons.plus,
+                    title: context.tr('Add a child'),
+                    onTap: () => editChild(context),
                   ),
                 ],
               ),
+              const SizedBox(height: 28),
+              SettingsGroup(
+                heading: context.tr('Preferences'),
+                rows: [
+                  SettingsRow(
+                    icon: LucideIcons.globe,
+                    title: context.tr('Language'),
+                    value: store.language.nativeName,
+                    onTap: () => _chooseLanguage(context),
+                  ),
+                  SettingsRow(
+                    icon: LucideIcons.ruler,
+                    title: context.tr('Units'),
+                    value: context.tr(store.units.label),
+                    onTap: () => _chooseUnits(context),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 28),
+              SettingsGroup(
+                heading: context.tr('Help'),
+                rows: [
+                  SettingsRow(
+                    icon: LucideIcons.shieldAlert,
+                    title: context.tr('Medical disclaimer'),
+                    subtitle: context.tr('Mother AI is not a doctor'),
+                    onTap: () => _showDisclaimer(context),
+                  ),
+                  SettingsRow(
+                    icon: LucideIcons.lifeBuoy,
+                    title: context.tr('Help centre'),
+                    onTap: () => openDocument(context, helpCentre),
+                  ),
+                  SettingsRow(
+                    icon: LucideIcons.mail,
+                    title: context.tr('Contact support'),
+                    onTap: () => showContactSheet(context),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 28),
+              SettingsGroup(
+                heading: context.tr('About'),
+                rows: [
+                  SettingsRow(
+                    icon: LucideIcons.fileText,
+                    title: context.tr('Terms of service'),
+                    onTap: () => openDocument(context, termsOfService),
+                  ),
+                  SettingsRow(
+                    icon: LucideIcons.fileLock,
+                    title: context.tr('Privacy policy'),
+                    onTap: () => openDocument(context, privacyPolicy),
+                  ),
+                  SettingsRow(
+                    icon: LucideIcons.info,
+                    title: context.tr('Version'),
+                    value: appVersion,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 28),
+              ShadButton.outline(
+                size: ShadButtonSize.lg,
+                textStyle: AppText.button,
+                foregroundColor: const Color(0xFFD92D40),
+                leading: const Icon(LucideIcons.logOut, size: 18),
+                onPressed: _notYet,
+                child: Text(context.tr('Sign out')),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Placeholder account; the name and email are sample data.
+class _Account extends StatelessWidget {
+  const _Account();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const DecoratedBox(
+          decoration: BoxDecoration(
+            color: AppColors.ink,
+            shape: BoxShape.circle,
+          ),
+          child: SizedBox.square(
+            dimension: 56,
+            child: Center(
+              child: Text(
+                'SM',
+                style: TextStyle(
+                  fontFamily: AppFonts.display,
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
             ),
           ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Sarah Mitchell', style: AppText.rowTitle),
+              const SizedBox(height: 2),
+              Text(
+                'sarah.mitchell@email.com',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppText.secondary,
+              ),
+            ],
+          ),
+        ),
+        ShadButton.outline(
+          size: ShadButtonSize.sm,
+          onPressed: ProfileTab._notYet,
+          child: Text(context.tr('Edit')),
         ),
       ],
     );
   }
 }
 
-/// Name, email and plan, with the avatar the rest of the app uses.
-class _AccountCard extends StatelessWidget {
-  const _AccountCard({required this.onEdit});
-
-  final VoidCallback onEdit;
+class _Plus extends StatelessWidget {
+  const _Plus();
 
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.85),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x08263965),
-            blurRadius: 14,
-            offset: Offset(0, 4),
-          ),
-        ],
+        color: AppColors.panel,
+        borderRadius: BorderRadius.circular(AppTheme.radius),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsetsDirectional.fromSTEB(16, 14, 12, 14),
         child: Row(
           children: [
-            Container(
-              width: 62,
-              height: 62,
-              alignment: Alignment.center,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Color(0xFF8499F3), Color(0xFFC078D8)],
-                ),
-              ),
-              child: const Text(
-                'SM',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 21,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-            const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Sarah Mitchell',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
+                  Text(context.tr('Mother AI Plus'), style: AppText.rowTitle),
                   const SizedBox(height: 2),
                   Text(
-                    'sarah.mitchell@email.com',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.bodyMedium
-                        ?.copyWith(fontSize: 13),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    'Member since March 2026',
-                    style: Theme.of(context).textTheme.bodyMedium
-                        ?.copyWith(fontSize: 11.5),
+                    context.tr(
+                      'Sample plan: unlimited chats, deeper answers, no ads.',
+                    ),
+                    style: AppText.secondary,
                   ),
                 ],
               ),
             ),
             const SizedBox(width: 8),
-            Material(
-              color: const Color(0xFFEEE6FF),
-              borderRadius: BorderRadius.circular(999),
-              child: InkWell(
-                borderRadius: BorderRadius.circular(999),
-                onTap: onEdit,
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                  child: Text(
-                    'Edit',
-                    style: TextStyle(
-                      color: AppColors.lavender,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ),
+            ShadButton.outline(
+              size: ShadButtonSize.sm,
+              onPressed: ProfileTab._notYet,
+              child: Text(context.tr('See plans')),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _PlanCard extends StatelessWidget {
-  const _PlanCard({required this.onUpgrade});
-
-  final VoidCallback onUpgrade;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: AppColors.navy,
-      borderRadius: BorderRadius.circular(20),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onUpgrade,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Container(
-                width: 42,
-                height: 42,
-                alignment: Alignment.center,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [Color(0xFF8499F3), Color(0xFFC078D8)],
-                  ),
-                ),
-                child: const Icon(
-                  Icons.auto_awesome_rounded,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 14),
-              const Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Mother AI Plus',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16.5,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    SizedBox(height: 3),
-                    Text(
-                      'Unlimited chats, deeper answers and no ads.',
-                      style: TextStyle(
-                        color: Color(0xFFB9C2DE),
-                        fontSize: 12.5,
-                        height: 1.3,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 10),
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                  child: Text(
-                    'Upgrade',
-                    style: TextStyle(
-                      color: AppColors.navy,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _GroupLabel extends StatelessWidget {
-  const _GroupLabel(this.text);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(4, 26, 4, 10),
-      child: Text(text, style: Theme.of(context).textTheme.labelSmall),
-    );
-  }
-}
-
-/// One rounded card holding a run of rows, hair-lined between them.
-class _SettingsGroup extends StatelessWidget {
-  const _SettingsGroup({required this.children});
-
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x08263965),
-            blurRadius: 14,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: Material(
-          color: Colors.white.withValues(alpha: 0.85),
-          child: Column(
-            children: [
-              for (var i = 0; i < children.length; i++) ...[
-                children[i],
-                if (i != children.length - 1)
-                  const Padding(
-                    padding: EdgeInsets.only(left: 62),
-                    child: Divider(
-                      height: 1,
-                      thickness: 1,
-                      color: AppColors.line,
-                    ),
-                  ),
-              ],
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _SettingsRow extends StatelessWidget {
-  const _SettingsRow({
-    this.icon,
-    this.iconColor,
-    this.iconBackground,
-    this.leading,
-    required this.title,
-    this.subtitle,
-    this.value,
-    this.trailing,
-    this.onTap,
-    this.destructive = false,
-  });
-
-  final IconData? icon;
-  final Color? iconColor;
-  final Color? iconBackground;
-
-  /// Used instead of [icon] when a row needs a richer leading element.
-  final Widget? leading;
-
-  final String title;
-  final String? subtitle;
-
-  /// Right-aligned current setting, e.g. "English".
-  final String? value;
-
-  /// Replaces the chevron, e.g. with a switch.
-  final Widget? trailing;
-
-  final VoidCallback? onTap;
-  final bool destructive;
-
-  @override
-  Widget build(BuildContext context) {
-    final titleStyle = Theme.of(context).textTheme.titleMedium?.copyWith(
-      fontSize: 15.5,
-      color: destructive ? AppColors.coral : AppColors.navy,
-    );
-
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(14, 13, 14, 13),
-        child: Row(
-          children: [
-            leading ??
-                Container(
-                  width: 34,
-                  height: 34,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: iconBackground,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(icon, color: iconColor, size: 18),
-                ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: titleStyle,
-                  ),
-                  if (subtitle != null) ...[
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle!,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.bodyMedium
-                          ?.copyWith(fontSize: 12),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            if (value != null) ...[
-              const SizedBox(width: 10),
-              Text(
-                value!,
-                style: Theme.of(context).textTheme.bodyMedium
-                    ?.copyWith(fontSize: 13.5),
-              ),
-            ],
-            const SizedBox(width: 6),
-            trailing ??
-                (onTap == null
-                    ? const SizedBox.shrink()
-                    : const Icon(
-                        Icons.chevron_right_rounded,
-                        color: AppColors.inkMuted,
-                        size: 22,
-                      )),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _RowSwitch extends StatelessWidget {
-  const _RowSwitch({required this.value, required this.onChanged});
-
-  final bool value;
-  final ValueChanged<bool> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Switch(
-      value: value,
-      onChanged: onChanged,
-      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-    );
-  }
-}
-
-class _ChildAvatar extends StatelessWidget {
-  const _ChildAvatar({required this.data});
-
-  final ChildProfile data;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 34,
-      height: 34,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: data.avatarBackground,
-        shape: BoxShape.circle,
-      ),
-      child: Text(
-        data.name[0],
-        style: const TextStyle(
-          color: AppColors.navy,
-          fontSize: 14.5,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
-    );
-  }
-}
-
-class _SignOutButton extends StatelessWidget {
-  const _SignOutButton({required this.onPressed});
-
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x08263965),
-            blurRadius: 14,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(18),
-        child: Material(
-          color: Colors.white.withValues(alpha: 0.85),
-          child: InkWell(
-            onTap: onPressed,
-            child: const Padding(
-              padding: EdgeInsets.symmetric(vertical: 15),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.logout_rounded, color: AppColors.coral, size: 18),
-                  SizedBox(width: 8),
-                  Text(
-                    'Sign out',
-                    style: TextStyle(
-                      color: AppColors.coral,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ProfileBackground extends StatelessWidget {
-  const _ProfileBackground();
-
-  @override
-  Widget build(BuildContext context) {
-    return const IgnorePointer(
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFFFBF7FF), AppColors.background],
-            stops: [0.0, 0.4],
-          ),
         ),
       ),
     );

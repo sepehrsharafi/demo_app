@@ -4,9 +4,12 @@ import 'package:flutter/material.dart';
 
 import '../../features/chat/chat_history_page.dart';
 import '../../features/home/home_page.dart';
+import '../../features/learn/articles.dart';
 import '../../features/learn/learn_page.dart';
 import '../../features/profile/profile_page.dart';
+import '../theme/app_motion.dart';
 import 'app_nav_bar.dart';
+import 'sheet_depth.dart';
 
 /// The app's persistent chrome: a single [AppNavBar] instance that stays
 /// mounted while the body underneath slides between tabs, so
@@ -65,41 +68,16 @@ class _AppShellState extends State<AppShell> {
   }
 
   Future<void> _warmVisualAssets() async {
-    final mediaQuery = MediaQuery.of(context);
-    final pixelRatio = mediaQuery.devicePixelRatio;
-    final screenWidth = mediaQuery.size.width;
-    final fullWidth = (screenWidth * pixelRatio).ceil();
-    final articleThumbnailWidth = (126 * pixelRatio).ceil();
-    final chatHeaderWidth = (300 * pixelRatio).round().clamp(1, 1774);
-
+    // The Learn photos are the only raster art. Each is decoded once at
+    // full size and shared by every place it appears (Home, Learn, the
+    // article), so a photo flying between them never waits on a decode.
     final images = <ImageProvider<Object>>[
-      // Highest priority: this otherwise decodes while the chat route is
-      // already animating in.
-      const AssetImage('assets/images/chat_watercolor_background.png'),
-      ResizeImage.resizeIfNeeded(
-        chatHeaderWidth,
-        null,
-        const AssetImage('assets/images/chat_header_botanical_transparent.png'),
-      ),
-      ResizeImage.resizeIfNeeded(
-        fullWidth,
-        null,
-        const AssetImage('assets/images/learn_growth_feature.webp'),
-      ),
-      for (final path in const [
-        'assets/images/learn_fever.webp',
-        'assets/images/learn_bedtime.webp',
-        'assets/images/learn_positive_discipline.webp',
-      ])
-        ResizeImage.resizeIfNeeded(
-          articleThumbnailWidth,
-          null,
-          AssetImage(path),
-        ),
+      for (final article in learnLibrary)
+        if (article.imagePath case final path?) AssetImage(path),
     ];
 
-    // Decode sequentially. A concurrent burst can itself steal enough CPU and
-    // memory bandwidth to make an early user interaction miss a frame.
+    // Sequentially: a concurrent burst can steal enough CPU to make an early
+    // tap miss a frame.
     for (final image in images) {
       if (!mounted) return;
       await precacheImage(image, context, onError: (_, _) {});
@@ -118,37 +96,33 @@ class _AppShellState extends State<AppShell> {
       onPopInvokedWithResult: (didPop, result) {
         if (!didPop && _selectedIndex != 0) _switchTab(0);
       },
-      child: Scaffold(
-        extendBody: true,
-        // The keyboard overlays the persistent bottom navigation instead of
-        // lifting it into the content area. Individual pushed screens (such
-        // as an open chat) still manage their own keyboard resizing.
-        resizeToAvoidBottomInset: false,
-        body: Stack(
-          children: [
-            for (var i = 0; i < _tabs.length; i++)
-              Positioned.fill(
-                child: _TabTransition(
-                  key: ValueKey('tab_$i'),
-                  // -1 = this tab lives to the left of the open one, 1 = right.
-                  direction: i.compareTo(_selectedIndex),
-                  child: _tabs[i],
-                ),
-              ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: SafeArea(
-                minimum: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 522),
-                  child: AppNavBar(
-                    selectedIndex: _selectedIndex,
-                    onSelected: _switchTab,
+      child: RecedeBehindSheets(
+        child: Scaffold(
+          extendBody: true,
+          // The keyboard overlays the persistent bottom navigation instead of
+          // lifting it into the content area. Individual pushed screens (such
+          // as an open chat) still manage their own keyboard resizing.
+          resizeToAvoidBottomInset: false,
+          body: Stack(
+            children: [
+              for (var i = 0; i < _tabs.length; i++)
+                Positioned.fill(
+                  child: _TabTransition(
+                    key: ValueKey('tab_$i'),
+                    // -1 = this tab lives to the left of the open one, 1 = right.
+                    direction: i.compareTo(_selectedIndex),
+                    child: _tabs[i],
                   ),
                 ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: AppNavBar(
+                  selectedIndex: _selectedIndex,
+                  onSelected: _switchTab,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -173,12 +147,8 @@ class _TabTransition extends StatefulWidget {
 
 class _TabTransitionState extends State<_TabTransition>
     with SingleTickerProviderStateMixin {
-  static const _duration = Duration(milliseconds: 270);
+  static const _duration = Duration(milliseconds: 340);
   static const _pageOffset = 1.0;
-
-  /// A quick initial response with a long, controlled settle. Unlike a spring,
-  /// it never overshoots and therefore never resamples or exposes page edges.
-  static const Curve _transitionCurve = Cubic(0.32, 0.72, 0.0, 1.0);
 
   late final AnimationController _controller;
   late Animation<Offset> _position;
@@ -239,7 +209,7 @@ class _TabTransitionState extends State<_TabTransition>
     _position = Tween<Offset>(
       begin: currentPosition,
       end: _active ? Offset.zero : _restingPosition(widget.direction),
-    ).animate(CurvedAnimation(parent: _controller, curve: _transitionCurve));
+    ).animate(CurvedAnimation(parent: _controller, curve: AppMotion.settle));
     _controller.forward(from: 0);
   }
 
@@ -261,6 +231,9 @@ class _TabTransitionState extends State<_TabTransition>
         // this transition outside TickerMode lets an outgoing page finish its
         // movement while its own content animations are already paused.
         child: SlideTransition(
+          // Tabs rest on the side their place in the bar is on, and the bar
+          // reads from the right in Arabic and Persian.
+          textDirection: Directionality.of(context),
           position: _position,
           child: FadeTransition(
             // A stopped 1/0 animation lets the renderer skip fully hidden tabs
@@ -270,7 +243,12 @@ class _TabTransitionState extends State<_TabTransition>
               // With no animated scale around this boundary, Flutter can
               // retain the page as a layer and only translate it during the
               // transition instead of resampling a full-screen image.
-              child: TickerMode(enabled: _active, child: widget.child),
+              // Hidden tabs keep their Heroes out of pushes, so an article
+              // opened from Home doesn't fly in from Learn's copy of it.
+              child: HeroMode(
+                enabled: _active,
+                child: TickerMode(enabled: _active, child: widget.child),
+              ),
             ),
           ),
         ),

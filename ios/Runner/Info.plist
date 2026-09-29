@@ -26,10 +26,6 @@
 		<string>$(FLUTTER_BUILD_NUMBER)</string>
 		<key>LSRequiresIPhoneOS</key>
 		<true/>
-		<key>NSCameraUsageDescription</key>
-		<string>Mother AI uses the camera so you can attach a photo to your chat.</string>
-		<key>NSPhotoLibraryUsageDescription</key>
-		<string>Mother AI accesses your photos so you can share helpful context in a chat.</string>
 		<key>UIApplicationSceneManifest</key>
 		<dict>
 			<key>UIApplicationSupportsMultipleScenes</key>

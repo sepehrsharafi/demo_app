@@ -1,0 +1,17 @@
+{
+  // On this machine flutter_tools often can't connect to the Dart Development
+  // Service ("Error connecting to the service protocol ... errno = 1225").
+  // "--no-devtools" only made it rarer; "--no-dds" skips that service, and
+  // hot reload and debugging talk to the app's VM service directly.
+  "dart.flutterRunAdditionalArgs": ["--no-dds"],
+
+  // pub.dev refuses this network ("Authentication error (403)" /
+  // "Your client does not have permission"), with or without the proxy, so
+  // `flutter run`'s package check fails before the app builds. The official
+  // Flutter mirror serves the same packages. The same two variables are also
+  // set in the Windows user environment for terminals and Android Studio.
+  "dart.env": {
+    "PUB_HOSTED_URL": "https://pub.flutter-io.cn",
+    "FLUTTER_STORAGE_BASE_URL": "https://storage.flutter-io.cn"
+  }
+}

@@ -1,0 +1,126 @@
+{
+  "title": "Choose the visual world for Mother AI",
+  "question": "The roll assigned Care Signal. Keep it, take an alternate, or re-roll.",
+  "options": [
+    {
+      "id": "assigned",
+      "label": "Care Signal",
+      "kicker": "THE ROLL",
+      "lineage": "The green / amber / red traffic-light card parents are given for a feverish child under five",
+      "thesis": "The colour in the app means something: green is fine to handle at home, amber means call your GP today, red means get help now.",
+      "palette": ["#FFFFFF", "#0F1B2D", "#00A86B", "#FFA412", "#F2384A", "#7B61FF"],
+      "materials": ["shadcn_ui components on cool white", "flat signal-colour bands", "one ruled rail per conversation", "tabular figures"],
+      "viewport": "Home opens on one big line (‘What’s on your mind?’), the ask field right under it, the child it’s about as a tap-to-switch chip, then recent chats each marked with its care colour.",
+      "risk": "Could feel clinical if the three signal colours leak into decoration. They must only ever mean a level of care, and most screens stay green and calm.",
+      "raised": [
+        {"from": "challenger-catalog-sleeve", "raise": "Say it once: a care level is one coloured band, never a badge plus a label plus an icon."},
+        {"from": "challenger-crouwel-grid", "raise": "One large headline per screen on a strict 4-pt grid. Everything else stays small and neutral."},
+        {"from": "challenger-deep-dive", "raise": "Each conversation runs down one vertical rail, and every answer marks its care level on it."},
+        {"from": "challenger-orizuru", "raise": "Guidance is set as numbered steps in a strict margin column, not as a paragraph."},
+        {"from": "challenger-oscilloscope", "raise": "Every quantity (ages, temperatures, read times) uses tabular figures so numbers line up."},
+        {"from": "challenger-exposure-sheets", "raise": "Pushed screens slide in as weighted sheets over the page and settle slightly, rather than hard-cutting."}
+      ]
+    },
+    {
+      "id": "model-pick",
+      "label": "The Red Book",
+      "kicker": "IMPECCABLE’S PICK",
+      "lineage": "The parent-held child health record: the UK Red Book and the German Mutterpass",
+      "thesis": "Each child is a booklet with a coloured cover, and every chat is written into it as an entry.",
+      "palette": ["#D7263D", "#1E3A8A", "#F5F3EE", "#1A1A1A"],
+      "materials": ["cloth-bound booklet covers", "ruled entry pages", "stamp-style dates"],
+      "viewport": "Home is a stack of your children’s booklets. Open one to ask about that child, with past entries below.",
+      "risk": "The most familiar idea for this category. It also drifts toward a journal or tracker, which the MVP deliberately avoids."
+    },
+    {
+      "id": "challenger-catalog-sleeve",
+      "label": "Factory catalog sleeve",
+      "verdict": "declined",
+      "lineage": "Peter Saville’s numbered Factory Records sleeves",
+      "thesis": "Everything is a catalog number decoded by colour.",
+      "palette": ["#0B0B0B", "#FFFFFF", "#E4572E", "#29BF12"],
+      "materials": ["matte black", "white hairline plot"],
+      "viewport": "A black field with one pulse plot and a numbered index.",
+      "risk": "A dark, coded world. It breaks the light theme you asked for.",
+      "case": "Fuses poorly: an anxious parent needs plain words, not a code to decode.",
+      "kept": "Say it once: nothing is labelled twice."
+    },
+    {
+      "id": "challenger-crouwel-grid",
+      "label": "Crouwel grid specimen",
+      "verdict": "declined",
+      "lineage": "Wim Crouwel’s gridded type posters",
+      "thesis": "Letterforms built cell by cell on a visible grid.",
+      "palette": ["#FFFFFF", "#1C3FAA", "#E8ECF7"],
+      "materials": ["graph-paper hairlines", "monumental grid type"],
+      "viewport": "Huge grid-built headline over a visible construction grid.",
+      "risk": "Reads as a type poster, not a companion.",
+      "case": "Fuses poorly: parents don’t recognise it, and a visible grid adds noise to a chat.",
+      "kept": "The grid’s discipline and one monumental headline per screen."
+    },
+    {
+      "id": "challenger-deep-dive",
+      "label": "Mesophotic deep dive",
+      "verdict": "declined",
+      "lineage": "Technical dive-computer profiles",
+      "thesis": "One vertical depth axis rules every line.",
+      "palette": ["#0A1F44", "#E8F1F8", "#2EE6D6"],
+      "materials": ["abyssal blue ground", "marine-snow texture"],
+      "viewport": "A descending depth profile with readouts.",
+      "risk": "Dark and cold: the wrong emotional temperature.",
+      "case": "Fuses poorly: a conversation is not a descent.",
+      "kept": "One vertical rail ruling each conversation."
+    },
+    {
+      "id": "challenger-orizuru",
+      "label": "Orizuru fold sequence",
+      "verdict": "declined",
+      "lineage": "Origami crane diagrams",
+      "thesis": "One sheet folded in numbered steps.",
+      "palette": ["#E0402F", "#F6EFE4", "#1A1A1A", "#C9A227"],
+      "materials": ["vermilion washi", "crease lines"],
+      "viewport": "A red square with numbered fold steps down the margin.",
+      "risk": "Beautiful but foreign to the parent’s world.",
+      "case": "Fuses poorly on identification, though it holds clarity for step-by-step guidance.",
+      "kept": "Numbered steps in a strict margin column."
+    },
+    {
+      "id": "challenger-oscilloscope",
+      "label": "Oscilloscope bench",
+      "verdict": "declined",
+      "lineage": "CRT signal instruments",
+      "thesis": "Every value is measured against a graticule.",
+      "palette": ["#0A0F0A", "#39FF88", "#FFB000"],
+      "materials": ["phosphor trace", "etched graticule"],
+      "viewport": "A live trace on a ten-division grid.",
+      "risk": "A dark lab instrument. Too technical and anxious for this audience.",
+      "case": "Fuses poorly on both axes.",
+      "kept": "Numbers in tabular figures, always aligned."
+    },
+    {
+      "id": "challenger-exposure-sheets",
+      "label": "Darkroom exposure record",
+      "verdict": "declined",
+      "lineage": "Printer’s exposure cards with tracing overlays",
+      "thesis": "Overlapping translucent sheets that slide aside.",
+      "palette": ["#EDEBE6", "#1B1B1B", "#D63AF9"],
+      "materials": ["tracing paper", "hatch density"],
+      "viewport": "Stacked sheets over a backlit zone ramp.",
+      "risk": "Hatching and zone numbers mean nothing to a parent.",
+      "case": "Fuses poorly on both axes.",
+      "kept": "Screens move as weighted sheets over the page."
+    }
+  ],
+  "reroll": {"registers": ["safer", "bolder"]},
+  "buildPath": {"value": "code", "toggle": false},
+  "canon": true,
+  "canonCard": {
+    "label": "Soft wellness companion",
+    "thesis": "What parenting apps usually ship: pastel lavender, rounded cards, friendly illustration.",
+    "palette": ["#FFFFFF", "#9C79E8", "#FFDAD6", "#10265A"],
+    "materials": ["rounded pastel cards", "illustration"],
+    "viewport": "Greeting, pastel prompt card, child cards, article card.",
+    "risk": "Close to what the app is today, and hard to tell apart from competitors."
+  },
+  "steer": true
+}

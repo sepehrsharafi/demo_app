@@ -1,0 +1,45 @@
+{
+  // F5 / Run and Debug. "--no-dds" works around flutter_tools failing to
+  // connect to the Dart Development Service on this machine ("Error
+  // connecting to the service protocol ... errno = 1225"). Hot reload and
+  // breakpoints still work against the app's VM service directly.
+  //
+  // The first entry is the default, and it is a release build: debug builds
+  // run Dart through a JIT, so every animation stutters the first time its
+  // code runs and only smooths out once it has been compiled. Release (and
+  // profile) builds are compiled ahead of time and animate smoothly from the
+  // very first frame. Pick "Mother AI (debug)" when you need hot reload or
+  // breakpoints, and "Mother AI (profile)" to measure performance in DevTools.
+  //
+  // Every entry reads the Groq API key from secrets.json (not committed).
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Mother AI",
+      "type": "dart",
+      "request": "launch",
+      "program": "lib/main.dart",
+      "flutterMode": "release",
+      "args": ["--no-dds"],
+      "toolArgs": ["--dart-define-from-file=secrets.json"]
+    },
+    {
+      "name": "Mother AI (debug)",
+      "type": "dart",
+      "request": "launch",
+      "program": "lib/main.dart",
+      "flutterMode": "debug",
+      "args": ["--no-dds"],
+      "toolArgs": ["--dart-define-from-file=secrets.json"]
+    },
+    {
+      "name": "Mother AI (profile)",
+      "type": "dart",
+      "request": "launch",
+      "program": "lib/main.dart",
+      "flutterMode": "profile",
+      "args": ["--no-dds"],
+      "toolArgs": ["--dart-define-from-file=secrets.json"]
+    }
+  ]
+}

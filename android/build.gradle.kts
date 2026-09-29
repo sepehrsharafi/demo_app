@@ -2,6 +2,10 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        // dl.google.com answers 404 through this network's proxy, so new
+        // AndroidX artifacts (e.g. androidx.browser for url_launcher) come
+        // from Aliyun's mirror of the same repository. Google stays first.
+        maven { url = uri("https://maven.aliyun.com/repository/google") }
     }
 }
 

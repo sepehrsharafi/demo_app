@@ -3,7 +3,7 @@
   "configurations": [
     {
       "name": "demo-app-web",
-      "runtimeExecutable": "C:\\Users\\11\\flutter\\bin\\flutter.bat",
+      "runtimeExecutable": "C:\Users\11\flutter\bin\flutter.bat",
       "runtimeArgs": ["run", "-d", "chrome", "--web-port", "5959"],
       "port": 5959
     }
